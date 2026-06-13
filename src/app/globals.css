@@ -80,6 +80,11 @@ body {
 }
 
 /* ---- Impressão / PDF ---- */
+/* A área de impressão só existe quando se imprime; na tela fica oculta. */
+#print-area {
+  display: none;
+}
+
 @media print {
   @page {
     size: A4;
@@ -88,23 +93,21 @@ body {
   html,
   body {
     background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
-  /* Esconde tudo, mostra só a área de impressão. */
-  body * {
-    visibility: hidden;
-  }
-  #print-area,
-  #print-area * {
-    visibility: visible;
+  /* Remove TODA a interface do fluxo (evita páginas em branco) e mostra só o currículo. */
+  .app-shell {
+    display: none !important;
   }
   #print-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    margin: 0;
-    box-shadow: none !important;
+    display: block !important;
   }
-  .a4-page {
+  /* A folha usa dimensões em mm e altura levemente menor que A4 para não
+     transbordar e gerar uma 2ª página em branco por arredondamento. */
+  #print-area .a4-page {
+    width: 210mm;
+    min-height: 296mm;
     box-shadow: none !important;
     border-radius: 0 !important;
   }

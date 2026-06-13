@@ -36,7 +36,8 @@ export default function Home() {
   const showOnboarding = hydrated && !prefs.onboardingDone;
 
   return (
-    <div className="flex h-screen flex-col">
+    <>
+      <div className="app-shell flex h-screen flex-col">
       {/* ===== Barra superior ===== */}
       <header className="no-print ui-scaled z-20 border-b border-slate-200 bg-white shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 sm:px-4">
@@ -202,11 +203,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ===== Área de impressão (só no print) ===== */}
-      <div id="print-area" className="pointer-events-none fixed left-0 top-0 -z-10 opacity-0 print:opacity-100">
-        <ResumePreview data={data} settings={settings} printMode />
-      </div>
-
       {/* ===== Modais ===== */}
       <TemplateGallery
         open={galleryOpen}
@@ -236,6 +232,12 @@ export default function Home() {
           setSupportOpen(true);
         }}
       />
-    </div>
+      </div>
+
+      {/* ===== Área de impressão (renderizada só na impressão) ===== */}
+      <div id="print-area">
+        <ResumePreview data={data} settings={settings} printMode />
+      </div>
+    </>
   );
 }
