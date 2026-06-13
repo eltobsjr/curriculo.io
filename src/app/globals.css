@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
+}
+
+:root {
+  --ui-scale: 1;
+}
+
+body {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 16px; /* base acessível */
+  line-height: 1.5;
+}
+
+/* ---- Acessibilidade ---- */
+/* Escala de fonte da interface (não afeta a folha A4 do currículo). */
+.ui-scaled {
+  font-size: calc(1rem * var(--ui-scale));
+}
+
+/* Foco sempre visível e nítido (WCAG 2.4.7). */
+:focus-visible {
+  outline: 3px solid #4f46e5;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Alvos de toque confortáveis (WCAG 2.5.5) na interface. */
+.ui-scaled button,
+.ui-scaled select,
+.ui-scaled input[type="file"] {
+  min-height: 44px;
+}
+.ui-scaled input,
+.ui-scaled textarea {
+  min-height: 44px;
+}
+
+/* Respeita quem prefere menos animação. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---- Folha A4 ---- */
+/* A4 = 210 x 297 mm ≈ 794 x 1123 px em 96dpi. Usamos px p/ escala previsível. */
+.a4-page {
+  width: 794px;
+  min-height: 1123px;
+  background: #fff;
+  overflow: hidden;
+}
+
+/* Aplica a fonte escolhida dentro da folha do currículo. */
+.font-resume-sans .a4-page,
+.font-resume-sans .a4-page * {
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+.font-resume-serif .a4-page,
+.font-resume-serif .a4-page * {
+  font-family: var(--font-serif), Georgia, serif;
+}
+.font-resume-mono .a4-page,
+.font-resume-mono .a4-page * {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+/* ---- Impressão / PDF ---- */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  /* Esconde tudo, mostra só a área de impressão. */
+  body * {
+    visibility: hidden;
+  }
+  #print-area,
+  #print-area * {
+    visibility: visible;
+  }
+  #print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin: 0;
+    box-shadow: none !important;
+  }
+  .a4-page {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  /* Garante que as cores de fundo dos templates sejam impressas. */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* Scrollbar discreta para a área de edição. */
+.thin-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.thin-scroll::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.4);
+  border-radius: 4px;
+}
