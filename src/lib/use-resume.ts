@@ -87,6 +87,12 @@ export function useResume() {
     });
   }, []);
 
+  // Carrega um documento completo (usado pela importação de JSON).
+  const loadDocument = useCallback((doc: { data?: Partial<ResumeData>; settings?: Partial<ResumeSettings> }) => {
+    if (doc.data) setData((prev) => ({ ...prev, ...doc.data } as ResumeData));
+    if (doc.settings) setSettings((prev) => ({ ...prev, ...doc.settings } as ResumeSettings));
+  }, []);
+
   return {
     data,
     settings,
@@ -96,5 +102,6 @@ export function useResume() {
     updateSettings,
     resetSample,
     clearAll,
+    loadDocument,
   };
 }

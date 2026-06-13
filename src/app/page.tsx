@@ -12,12 +12,13 @@ import { ResumePreview } from "@/components/ResumePreview";
 import { TemplateGallery } from "@/components/TemplateGallery";
 import { QualityPanel } from "@/components/QualityPanel";
 import { Onboarding } from "@/components/Onboarding";
+import { ImportExport } from "@/components/ImportExport";
 import { SupportModal } from "@/components/SupportModal";
 import { PostDownloadModal } from "@/components/PostDownloadModal";
 import { Btn } from "@/components/ui";
 
 export default function Home() {
-  const { data, settings, updateData, updateSettings, resetSample, clearAll } = useResume();
+  const { data, settings, updateData, updateSettings, resetSample, clearAll, loadDocument } = useResume();
   const { prefs, hydrated, set, incFont, decFont } = useUiPrefs();
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<"editar" | "ver">("editar");
@@ -162,10 +163,12 @@ export default function Home() {
                   ⚡ Avançado
                 </button>
               </div>
-              <div className="flex gap-1 text-xs">
+              <div className="flex flex-wrap items-center gap-1 text-xs">
                 <button onClick={resetSample} className="text-slate-500 hover:underline">
                   exemplo
                 </button>
+                <span className="text-slate-300">·</span>
+                <ImportExport data={data} settings={settings} onImport={loadDocument} />
                 <span className="text-slate-300">·</span>
                 <button onClick={clearAll} className="text-red-500 hover:underline">
                   limpar
