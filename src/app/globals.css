@@ -54,10 +54,11 @@ body {
   width: 794px;
   min-height: 1123px;
   background: #fff;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
+/* Currículos longos fluem para uma 2ª página (na tela e na impressão) em vez
+   de serem cortados. Os thumbnails da galeria recortam pelo próprio contêiner. */
 /* O conteúdo do template (filho único) estica para preencher a folha inteira.
    Resolve áreas coloridas (ex.: sidebar) que paravam onde o texto terminava. */
 .a4-page > * {
