@@ -2,23 +2,28 @@
 
 import { useRef } from "react";
 import { ResumeData, ResumeSettings } from "@/lib/resume-schema";
+import { Lang } from "@/lib/i18n";
 
 interface Props {
-  data: ResumeData;
+  content: Partial<Record<Lang, ResumeData>>;
   settings: ResumeSettings;
-  onImport: (doc: { data?: Partial<ResumeData>; settings?: Partial<ResumeSettings> }) => void;
+  onImport: (doc: {
+    content?: Partial<Record<Lang, ResumeData>>;
+    data?: Partial<ResumeData>;
+    settings?: Partial<ResumeSettings>;
+  }) => void;
 }
 
-// Exporta o currículo como arquivo .json (backup) e importa de volta.
-// Permite o usuário salvar/restaurar ou levar os dados para outro navegador.
-export function ImportExport({ data, settings, onImport }: Props) {
+// Exporta o currículo (todos os idiomas) como .json e importa de volta.
+export function ImportExport({ content, settings, onImport }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const exportJson = () => {
-    const blob = new Blob([JSON.stringify({ data, settings }, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify({ content, settings }, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    const nome = (data.fullName || "curriculo").trim().toLowerCase().replace(/\s+/g, "-");
+    const active = content[settings.language ?? "pt"];
+    const nome = (active?.fullName || "curriculo").trim().toLowerCase().replace(/\s+/g, "-");
     a.href = url;
     a.download = `${nome}.json`;
     a.click();
@@ -31,7 +36,8 @@ export function ImportExport({ data, settings, onImport }: Props) {
     reader.onload = () => {
       try {
         const doc = JSON.parse(String(reader.result));
-        onImport({ data: doc.data ?? doc, settings: doc.settings });
+        // aceita formato novo ({content}), antigo ({data}) ou um ResumeData cru
+        onImport({ content: doc.content, data: doc.content ? undefined : doc.data ?? doc, settings: doc.settings });
       } catch {
         alert("Arquivo inválido. Selecione um .json exportado pelo Currículo.io.");
       }

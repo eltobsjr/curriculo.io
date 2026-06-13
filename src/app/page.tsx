@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useResume } from "@/lib/use-resume";
 import { useUiPrefs } from "@/lib/use-ui-prefs";
 import { ACCENT_PRESETS, FONT_OPTIONS } from "@/lib/resume-schema";
+import { LANGUAGES } from "@/lib/i18n";
 import { getTemplate } from "@/templates/registry";
 import { EditorPanel } from "@/components/EditorPanel";
 import { GuidedEditor } from "@/components/GuidedEditor";
@@ -18,7 +19,8 @@ import { PostDownloadModal } from "@/components/PostDownloadModal";
 import { Btn } from "@/components/ui";
 
 export default function Home() {
-  const { data, settings, updateData, updateSettings, resetSample, clearAll, loadDocument } = useResume();
+  const { data, settings, content, availableLangs, updateData, updateSettings, switchLanguage, resetSample, clearAll, loadDocument } =
+    useResume();
   const { prefs, hydrated, set, incFont, decFont } = useUiPrefs();
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<"editar" | "ver">("editar");
@@ -97,6 +99,23 @@ export default function Home() {
               ))}
             </select>
 
+            {/* Idioma do currículo */}
+            <div className="flex items-center rounded-lg border border-slate-300" title="Idioma do currículo">
+              {LANGUAGES.map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => switchLanguage(l.code)}
+                  aria-label={`Currículo em ${l.label}`}
+                  title={availableLangs.includes(l.code) ? l.label : `${l.label} (criar a partir do atual)`}
+                  className={`px-2 py-1.5 text-sm transition ${
+                    settings.language === l.code ? "bg-indigo-600 text-white" : "text-slate-600 hover:bg-slate-100"
+                  } ${availableLangs.includes(l.code) || settings.language === l.code ? "" : "opacity-50"} first:rounded-l-md last:rounded-r-md`}
+                >
+                  {l.flag}
+                </button>
+              ))}
+            </div>
+
             <Btn variant="outline" onClick={() => setGalleryOpen(true)}>
               🎨 <span className="hidden sm:inline">Modelos</span>
             </Btn>
@@ -168,7 +187,7 @@ export default function Home() {
                   exemplo
                 </button>
                 <span className="text-slate-300">·</span>
-                <ImportExport data={data} settings={settings} onImport={loadDocument} />
+                <ImportExport content={content} settings={settings} onImport={loadDocument} />
                 <span className="text-slate-300">·</span>
                 <button onClick={clearAll} className="text-red-500 hover:underline">
                   limpar
