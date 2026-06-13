@@ -115,6 +115,21 @@ body {
   .no-print {
     display: none !important;
   }
+  /* ---- Quebra de página inteligente ----
+     Uma seção tenta ficar inteira numa folha; se não couber, vai inteira para a
+     próxima. Itens (cargos, projetos) nunca se partem no meio, e o título da
+     seção nunca fica órfão no fim da página. */
+  #print-area section,
+  #print-area li {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  #print-area h1,
+  #print-area h2,
+  #print-area h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
   /* Garante que as cores de fundo dos templates sejam impressas. */
   * {
     -webkit-print-color-adjust: exact !important;
