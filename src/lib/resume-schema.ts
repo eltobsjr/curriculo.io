@@ -2,6 +2,8 @@
 // Todos os templates ("skins") consomem EXATAMENTE este formato.
 // Adicionar um campo aqui = disponível para todos os templates de uma vez.
 
+import { Lang } from "./i18n";
+
 export interface SocialLink {
   id: string;
   label: string; // ex: "LinkedIn", "GitHub", "Portfólio"
@@ -81,12 +83,14 @@ export interface ResumeSettings {
   templateId: string;
   accentColor: string; // hex
   fontFamily: FontKey;
+  language: Lang; // idioma ativo do currículo (rótulos das seções)
 }
 
 export type FontKey = "sans" | "serif" | "mono";
 
+// Documento multi-idioma: o conteúdo é mantido por idioma.
 export interface ResumeDocument {
-  data: ResumeData;
+  content: Partial<Record<Lang, ResumeData>>;
   settings: ResumeSettings;
 }
 
@@ -115,4 +119,5 @@ export const DEFAULT_SETTINGS: ResumeSettings = {
   templateId: "moderno",
   accentColor: "#4F46E5",
   fontFamily: "sans",
+  language: "pt",
 };
