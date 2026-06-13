@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { EditMode } from "@/lib/use-ui-prefs";
 
 interface Props {
@@ -12,9 +13,7 @@ export function Onboarding({ onChoose }: Props) {
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 p-4">
       <div className="ui-scaled w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl sm:p-8">
         <div className="mb-1 flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-lg font-bold text-white">
-            C
-          </span>
+          <Image src="/logo.png" alt="Currículo.io" width={36} height={36} className="h-9 w-9" />
           <span className="text-xl font-bold text-slate-800">
             Currículo<span className="text-indigo-600">.io</span>
           </span>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useResume } from "@/lib/use-resume";
 import { useUiPrefs } from "@/lib/use-ui-prefs";
 import { ACCENT_PRESETS, FONT_OPTIONS } from "@/lib/resume-schema";
@@ -40,9 +41,7 @@ export default function Home() {
       <header className="no-print ui-scaled z-20 border-b border-slate-200 bg-white shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 sm:px-4">
           <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-base font-bold text-white">
-              C
-            </span>
+            <Image src="/logo.png" alt="Currículo.io" width={32} height={32} className="h-8 w-8" priority />
             <span className="text-base font-bold text-slate-800">
               Currículo<span className="text-indigo-600">.io</span>
             </span>
