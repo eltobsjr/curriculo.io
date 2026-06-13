@@ -1,9 +1,11 @@
 import { TemplateProps } from "../types";
+import { labels } from "@/lib/i18n";
 import { Bullets, contactItems, hasItems } from "../shared";
 
 // Minimalista: muito espaço em branco, tipografia fina, linhas sutis.
 export default function Minimalista({ data, settings }: TemplateProps) {
   const c = settings.accentColor;
+  const L = labels(settings.language);
   return (
     <div className="h-full w-full bg-white px-14 py-12 text-[11px] font-light leading-relaxed text-slate-600">
       <header>
@@ -22,7 +24,7 @@ export default function Minimalista({ data, settings }: TemplateProps) {
       {data.summary && <p className="mt-8 max-w-none leading-7 text-slate-600">{data.summary}</p>}
 
       {hasItems(data.experiences) && (
-        <Section title="Experiência" color={c}>
+        <Section title={L.experience} color={c}>
           <div className="space-y-5">
             {data.experiences.map((e) => (
               <div key={e.id} className="grid grid-cols-[88px_1fr] gap-4">
@@ -45,7 +47,7 @@ export default function Minimalista({ data, settings }: TemplateProps) {
       )}
 
       {hasItems(data.education) && (
-        <Section title="Formação" color={c}>
+        <Section title={L.education} color={c}>
           <div className="space-y-3">
             {data.education.map((e) => (
               <div key={e.id} className="grid grid-cols-[88px_1fr] gap-4">
@@ -65,7 +67,7 @@ export default function Minimalista({ data, settings }: TemplateProps) {
       <div className="mt-8 grid grid-cols-3 gap-6">
         {hasItems(data.skills) && (
           <div>
-            <SectionTitle color={c}>Competências</SectionTitle>
+            <SectionTitle color={c}>{L.skills}</SectionTitle>
             <ul className="space-y-0.5 text-slate-600">
               {data.skills.map((s) => (
                 <li key={s.id}>{s.name}</li>
@@ -75,7 +77,7 @@ export default function Minimalista({ data, settings }: TemplateProps) {
         )}
         {hasItems(data.languages) && (
           <div>
-            <SectionTitle color={c}>Idiomas</SectionTitle>
+            <SectionTitle color={c}>{L.languages}</SectionTitle>
             <ul className="space-y-0.5 text-slate-600">
               {data.languages.map((l) => (
                 <li key={l.id}>

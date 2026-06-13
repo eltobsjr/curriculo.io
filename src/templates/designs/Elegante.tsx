@@ -1,9 +1,11 @@
 import { TemplateProps } from "../types";
+import { labels } from "@/lib/i18n";
 import { Bullets, contactItems, hasItems } from "../shared";
 
 // Elegante: títulos serifados, finas linhas de destaque, sofisticado.
 export default function Elegante({ data, settings }: TemplateProps) {
   const c = settings.accentColor;
+  const L = labels(settings.language);
   return (
     <div className="h-full w-full bg-white px-12 py-11 text-[11px] leading-relaxed text-slate-700">
       <header className="text-center">
@@ -25,13 +27,13 @@ export default function Elegante({ data, settings }: TemplateProps) {
       </header>
 
       {data.summary && (
-        <Section title="Perfil" color={c}>
+        <Section title={L.profile} color={c}>
           <p className="text-center italic text-slate-600">{data.summary}</p>
         </Section>
       )}
 
       {hasItems(data.experiences) && (
-        <Section title="Experiência" color={c}>
+        <Section title={L.experience} color={c}>
           <div className="space-y-3">
             {data.experiences.map((e) => (
               <div key={e.id}>
@@ -53,7 +55,7 @@ export default function Elegante({ data, settings }: TemplateProps) {
       )}
 
       {hasItems(data.education) && (
-        <Section title="Formação" color={c}>
+        <Section title={L.education} color={c}>
           <div className="space-y-2">
             {data.education.map((e) => (
               <div key={e.id} className="flex items-baseline justify-between">
@@ -72,12 +74,12 @@ export default function Elegante({ data, settings }: TemplateProps) {
 
       <div className="grid grid-cols-2 gap-8">
         {hasItems(data.skills) && (
-          <Section title="Competências" color={c}>
+          <Section title={L.skills} color={c}>
             <p className="text-slate-600">{data.skills.map((s) => s.name).join(" · ")}</p>
           </Section>
         )}
         {hasItems(data.languages) && (
-          <Section title="Idiomas" color={c}>
+          <Section title={L.languages} color={c}>
             <ul className="space-y-0.5">
               {data.languages.map((l) => (
                 <li key={l.id} className="flex justify-between">
@@ -91,7 +93,7 @@ export default function Elegante({ data, settings }: TemplateProps) {
       </div>
 
       {hasItems(data.certifications) && (
-        <Section title="Certificações" color={c}>
+        <Section title={L.certifications} color={c}>
           <p className="text-slate-600">
             {data.certifications.map((cert) => cert.name + (cert.date ? ` (${cert.date})` : "")).join(" · ")}
           </p>

@@ -1,9 +1,11 @@
 import { TemplateProps } from "../types";
+import { labels } from "@/lib/i18n";
 import { Bullets, contactItems, hasItems } from "../shared";
 
 // Compacto: duas colunas densas, ótimo para currículos com muito conteúdo.
 export default function Compacto({ data, settings }: TemplateProps) {
   const c = settings.accentColor;
+  const L = labels(settings.language);
   return (
     <div className="h-full w-full bg-white px-9 py-8 text-[10.5px] leading-snug text-slate-700">
       <header className="mb-4 flex items-end justify-between border-b-2 pb-3" style={{ borderColor: c }}>
@@ -27,13 +29,13 @@ export default function Compacto({ data, settings }: TemplateProps) {
         {/* Coluna principal */}
         <div>
           {data.summary && (
-            <Block title="Resumo" color={c}>
+            <Block title={L.summary} color={c}>
               <p>{data.summary}</p>
             </Block>
           )}
 
           {hasItems(data.experiences) && (
-            <Block title="Experiência" color={c}>
+            <Block title={L.experience} color={c}>
               <div className="space-y-2.5">
                 {data.experiences.map((e) => (
                   <div key={e.id}>
@@ -55,7 +57,7 @@ export default function Compacto({ data, settings }: TemplateProps) {
           )}
 
           {hasItems(data.projects) && (
-            <Block title="Projetos" color={c}>
+            <Block title={L.projects} color={c}>
               <div className="space-y-1.5">
                 {data.projects.map((p) => (
                   <div key={p.id}>
@@ -72,7 +74,7 @@ export default function Compacto({ data, settings }: TemplateProps) {
         {/* Coluna lateral */}
         <div>
           {hasItems(data.education) && (
-            <Block title="Formação" color={c}>
+            <Block title={L.education} color={c}>
               <div className="space-y-2">
                 {data.education.map((e) => (
                   <div key={e.id}>
@@ -88,7 +90,7 @@ export default function Compacto({ data, settings }: TemplateProps) {
           )}
 
           {hasItems(data.skills) && (
-            <Block title="Competências" color={c}>
+            <Block title={L.skills} color={c}>
               <div className="flex flex-wrap gap-1">
                 {data.skills.map((s) => (
                   <span key={s.id} className="rounded border px-1.5 py-0.5 text-[9px]" style={{ borderColor: c, color: c }}>
@@ -100,7 +102,7 @@ export default function Compacto({ data, settings }: TemplateProps) {
           )}
 
           {hasItems(data.languages) && (
-            <Block title="Idiomas" color={c}>
+            <Block title={L.languages} color={c}>
               <ul className="space-y-0.5">
                 {data.languages.map((l) => (
                   <li key={l.id}>
@@ -113,7 +115,7 @@ export default function Compacto({ data, settings }: TemplateProps) {
           )}
 
           {hasItems(data.certifications) && (
-            <Block title="Certificações" color={c}>
+            <Block title={L.certifications} color={c}>
               <ul className="space-y-1">
                 {data.certifications.map((cert) => (
                   <li key={cert.id}>

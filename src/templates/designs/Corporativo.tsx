@@ -1,9 +1,11 @@
 import { TemplateProps } from "../types";
+import { labels } from "@/lib/i18n";
 import { Bullets, contactItems, hasItems } from "../shared";
 
 // Corporativo: bloco de cabeçalho sólido, sóbrio e profissional.
 export default function Corporativo({ data, settings }: TemplateProps) {
   const c = settings.accentColor;
+  const L = labels(settings.language);
   return (
     <div className="h-full w-full bg-white text-[11px] leading-relaxed text-slate-700">
       {/* Cabeçalho sólido */}
@@ -24,13 +26,13 @@ export default function Corporativo({ data, settings }: TemplateProps) {
 
       <div className="px-10 py-7">
         {data.summary && (
-          <Section title="Resumo" color={c}>
+          <Section title={L.summary} color={c}>
             <p>{data.summary}</p>
           </Section>
         )}
 
         {hasItems(data.experiences) && (
-          <Section title="Experiência Profissional" color={c}>
+          <Section title={L.experience} color={c}>
             <div className="space-y-3">
               {data.experiences.map((e) => (
                 <div key={e.id} className="border-l-2 pl-3" style={{ borderColor: c }}>
@@ -53,7 +55,7 @@ export default function Corporativo({ data, settings }: TemplateProps) {
 
         <div className="grid grid-cols-2 gap-8">
           {hasItems(data.education) && (
-            <Section title="Formação" color={c}>
+            <Section title={L.education} color={c}>
               <div className="space-y-2">
                 {data.education.map((e) => (
                   <div key={e.id}>
@@ -67,7 +69,7 @@ export default function Corporativo({ data, settings }: TemplateProps) {
               </div>
             </Section>
           )}
-          <Section title="Competências" color={c}>
+          <Section title={L.skills} color={c}>
             <div className="flex flex-wrap gap-1.5">
               {data.skills.map((s) => (
                 <span key={s.id} className="rounded px-2 py-0.5 text-[10px] font-medium text-white" style={{ backgroundColor: c }}>
@@ -77,7 +79,7 @@ export default function Corporativo({ data, settings }: TemplateProps) {
             </div>
             {hasItems(data.languages) && (
               <div className="mt-3">
-                <h4 className="mb-1 text-[10px] font-bold uppercase tracking-wide text-slate-500">Idiomas</h4>
+                <h4 className="mb-1 text-[10px] font-bold uppercase tracking-wide text-slate-500">{L.languages}</h4>
                 <ul className="space-y-0.5">
                   {data.languages.map((l) => (
                     <li key={l.id} className="flex justify-between">
@@ -92,7 +94,7 @@ export default function Corporativo({ data, settings }: TemplateProps) {
         </div>
 
         {hasItems(data.certifications) && (
-          <Section title="Certificações" color={c}>
+          <Section title={L.certifications} color={c}>
             <ul className="space-y-1">
               {data.certifications.map((cert) => (
                 <li key={cert.id}>

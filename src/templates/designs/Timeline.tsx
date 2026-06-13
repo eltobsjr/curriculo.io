@@ -1,9 +1,11 @@
 import { TemplateProps } from "../types";
+import { labels } from "@/lib/i18n";
 import { Bullets, contactItems, hasItems } from "../shared";
 
 // Timeline: experiências e formação dispostas em linha do tempo vertical.
 export default function Timeline({ data, settings }: TemplateProps) {
   const c = settings.accentColor;
+  const L = labels(settings.language);
   return (
     <div className="h-full w-full bg-white px-10 py-9 text-[11px] leading-relaxed text-slate-700">
       <header
@@ -24,14 +26,14 @@ export default function Timeline({ data, settings }: TemplateProps) {
 
       {data.summary && (
         <section className="mb-5">
-          <SectionTitle color={c}>Resumo</SectionTitle>
+          <SectionTitle color={c}>{L.summary}</SectionTitle>
           <p>{data.summary}</p>
         </section>
       )}
 
       {hasItems(data.experiences) && (
         <section className="mb-5">
-          <SectionTitle color={c}>Experiência</SectionTitle>
+          <SectionTitle color={c}>{L.experience}</SectionTitle>
           <ol className="relative ml-2 border-l-2" style={{ borderColor: c }}>
             {data.experiences.map((e) => (
               <li key={e.id} className="mb-4 pl-5">
@@ -58,7 +60,7 @@ export default function Timeline({ data, settings }: TemplateProps) {
 
       {hasItems(data.education) && (
         <section className="mb-5">
-          <SectionTitle color={c}>Formação</SectionTitle>
+          <SectionTitle color={c}>{L.education}</SectionTitle>
           <ol className="relative ml-2 border-l-2" style={{ borderColor: c }}>
             {data.education.map((e) => (
               <li key={e.id} className="mb-3 pl-5">
@@ -82,7 +84,7 @@ export default function Timeline({ data, settings }: TemplateProps) {
       <div className="grid grid-cols-2 gap-6">
         {hasItems(data.skills) && (
           <div>
-            <SectionTitle color={c}>Competências</SectionTitle>
+            <SectionTitle color={c}>{L.skills}</SectionTitle>
             <div className="flex flex-wrap gap-1.5">
               {data.skills.map((s) => (
                 <span
@@ -98,7 +100,7 @@ export default function Timeline({ data, settings }: TemplateProps) {
         )}
         {hasItems(data.languages) && (
           <div>
-            <SectionTitle color={c}>Idiomas</SectionTitle>
+            <SectionTitle color={c}>{L.languages}</SectionTitle>
             <ul className="space-y-1">
               {data.languages.map((l) => (
                 <li key={l.id} className="flex justify-between">

@@ -1,9 +1,11 @@
 import { TemplateProps } from "../types";
+import { labels } from "@/lib/i18n";
 import { Bullets, contactItems, hasItems, LevelBar } from "../shared";
 
 // Moderno: cabeçalho com faixa de cor, uma coluna, limpo e atual.
 export default function Moderno({ data, settings }: TemplateProps) {
   const c = settings.accentColor;
+  const L = labels(settings.language);
   return (
     <div className="h-full w-full bg-white px-10 py-9 text-[11px] leading-relaxed text-slate-700">
       {/* Cabeçalho */}
@@ -25,13 +27,13 @@ export default function Moderno({ data, settings }: TemplateProps) {
       </header>
 
       {data.summary && (
-        <Section title="Resumo" color={c}>
+        <Section title={L.summary} color={c}>
           <p>{data.summary}</p>
         </Section>
       )}
 
       {hasItems(data.experiences) && (
-        <Section title="Experiência" color={c}>
+        <Section title={L.experience} color={c}>
           <div className="space-y-3">
             {data.experiences.map((e) => (
               <div key={e.id}>
@@ -53,7 +55,7 @@ export default function Moderno({ data, settings }: TemplateProps) {
       )}
 
       {hasItems(data.education) && (
-        <Section title="Formação" color={c}>
+        <Section title={L.education} color={c}>
           <div className="space-y-2">
             {data.education.map((e) => (
               <div key={e.id} className="flex items-baseline justify-between">
@@ -72,7 +74,7 @@ export default function Moderno({ data, settings }: TemplateProps) {
 
       <div className="grid grid-cols-2 gap-6">
         {hasItems(data.skills) && (
-          <Section title="Competências" color={c}>
+          <Section title={L.skills} color={c}>
             <div className="space-y-1.5">
               {data.skills.map((s) => (
                 <div key={s.id}>
@@ -88,7 +90,7 @@ export default function Moderno({ data, settings }: TemplateProps) {
 
         <div>
           {hasItems(data.languages) && (
-            <Section title="Idiomas" color={c}>
+            <Section title={L.languages} color={c}>
               <ul className="space-y-1">
                 {data.languages.map((l) => (
                   <li key={l.id} className="flex justify-between">
@@ -100,7 +102,7 @@ export default function Moderno({ data, settings }: TemplateProps) {
             </Section>
           )}
           {hasItems(data.certifications) && (
-            <Section title="Certificações" color={c}>
+            <Section title={L.certifications} color={c}>
               <ul className="space-y-1">
                 {data.certifications.map((cert) => (
                   <li key={cert.id}>
@@ -116,7 +118,7 @@ export default function Moderno({ data, settings }: TemplateProps) {
       </div>
 
       {hasItems(data.projects) && (
-        <Section title="Projetos" color={c}>
+        <Section title={L.projects} color={c}>
           <div className="space-y-2">
             {data.projects.map((p) => (
               <div key={p.id}>

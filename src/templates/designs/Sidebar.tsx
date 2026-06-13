@@ -1,9 +1,11 @@
 import { TemplateProps } from "../types";
+import { labels } from "@/lib/i18n";
 import { Bullets, hasItems, LevelDots } from "../shared";
 
 // Sidebar: coluna lateral colorida com foto, contato, skills e idiomas.
 export default function Sidebar({ data, settings }: TemplateProps) {
   const c = settings.accentColor;
+  const L = labels(settings.language);
   return (
     <div className="flex h-full w-full bg-white text-[11px] leading-relaxed text-slate-700">
       {/* Coluna lateral */}
@@ -21,7 +23,7 @@ export default function Sidebar({ data, settings }: TemplateProps) {
           </div>
         )}
 
-        <SideSection title="Contato">
+        <SideSection title={L.contact}>
           <ul className="space-y-1 break-words text-[10px] text-white/90">
             {data.email && <li>{data.email}</li>}
             {data.phone && <li>{data.phone}</li>}
@@ -36,7 +38,7 @@ export default function Sidebar({ data, settings }: TemplateProps) {
         </SideSection>
 
         {hasItems(data.skills) && (
-          <SideSection title="Competências">
+          <SideSection title={L.skills}>
             <div className="space-y-2">
               {data.skills.map((s) => (
                 <div key={s.id}>
@@ -49,7 +51,7 @@ export default function Sidebar({ data, settings }: TemplateProps) {
         )}
 
         {hasItems(data.languages) && (
-          <SideSection title="Idiomas">
+          <SideSection title={L.languages}>
             <ul className="space-y-1 text-[10px] text-white/90">
               {data.languages.map((l) => (
                 <li key={l.id} className="flex justify-between">
@@ -70,13 +72,13 @@ export default function Sidebar({ data, settings }: TemplateProps) {
         </p>
 
         {data.summary && (
-          <MainSection title="Perfil" color={c}>
+          <MainSection title={L.profile} color={c}>
             <p>{data.summary}</p>
           </MainSection>
         )}
 
         {hasItems(data.experiences) && (
-          <MainSection title="Experiência" color={c}>
+          <MainSection title={L.experience} color={c}>
             <div className="space-y-3">
               {data.experiences.map((e) => (
                 <div key={e.id}>
@@ -98,7 +100,7 @@ export default function Sidebar({ data, settings }: TemplateProps) {
         )}
 
         {hasItems(data.education) && (
-          <MainSection title="Formação" color={c}>
+          <MainSection title={L.education} color={c}>
             <div className="space-y-2">
               {data.education.map((e) => (
                 <div key={e.id} className="flex items-baseline justify-between">
@@ -116,7 +118,7 @@ export default function Sidebar({ data, settings }: TemplateProps) {
         )}
 
         {hasItems(data.projects) && (
-          <MainSection title="Projetos" color={c}>
+          <MainSection title={L.projects} color={c}>
             <div className="space-y-2">
               {data.projects.map((p) => (
                 <div key={p.id}>

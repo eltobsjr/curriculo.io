@@ -1,9 +1,11 @@
 import { TemplateProps } from "../types";
+import { labels } from "@/lib/i18n";
 import { Bullets, contactItems, hasItems } from "../shared";
 
 // Clássico/ATS: serifado, uma coluna, sem cores fortes nem ícones.
 // Otimizado para leitura por sistemas de triagem (ATS).
-export default function ClassicoATS({ data }: TemplateProps) {
+export default function ClassicoATS({ data, settings }: TemplateProps) {
+  const L = labels(settings.language);
   return (
     <div className="h-full w-full bg-white px-12 py-10 font-serif text-[11px] leading-relaxed text-black">
       <header className="text-center">
@@ -20,13 +22,13 @@ export default function ClassicoATS({ data }: TemplateProps) {
       <Rule />
 
       {data.summary && (
-        <Section title="Resumo Profissional">
+        <Section title={L.summary}>
           <p className="text-justify">{data.summary}</p>
         </Section>
       )}
 
       {hasItems(data.experiences) && (
-        <Section title="Experiência Profissional">
+        <Section title={L.experience}>
           <div className="space-y-2.5">
             {data.experiences.map((e) => (
               <div key={e.id}>
@@ -48,7 +50,7 @@ export default function ClassicoATS({ data }: TemplateProps) {
       )}
 
       {hasItems(data.education) && (
-        <Section title="Formação Acadêmica">
+        <Section title={L.education}>
           <div className="space-y-1.5">
             {data.education.map((e) => (
               <div key={e.id}>
@@ -66,19 +68,19 @@ export default function ClassicoATS({ data }: TemplateProps) {
       )}
 
       {hasItems(data.skills) && (
-        <Section title="Competências">
+        <Section title={L.skills}>
           <p>{data.skills.map((s) => s.name).join(" • ")}</p>
         </Section>
       )}
 
       {hasItems(data.languages) && (
-        <Section title="Idiomas">
+        <Section title={L.languages}>
           <p>{data.languages.map((l) => `${l.name} (${l.level})`).join(" • ")}</p>
         </Section>
       )}
 
       {hasItems(data.certifications) && (
-        <Section title="Certificações">
+        <Section title={L.certifications}>
           <ul className="list-disc pl-5">
             {data.certifications.map((c) => (
               <li key={c.id}>
@@ -92,7 +94,7 @@ export default function ClassicoATS({ data }: TemplateProps) {
       )}
 
       {hasItems(data.projects) && (
-        <Section title="Projetos">
+        <Section title={L.projects}>
           <div className="space-y-1.5">
             {data.projects.map((p) => (
               <div key={p.id}>
