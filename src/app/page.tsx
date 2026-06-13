@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useResume } from "@/lib/use-resume";
 import { useUiPrefs } from "@/lib/use-ui-prefs";
 import { ACCENT_PRESETS, FONT_OPTIONS } from "@/lib/resume-schema";
@@ -11,6 +11,8 @@ import { ResumePreview } from "@/components/ResumePreview";
 import { TemplateGallery } from "@/components/TemplateGallery";
 import { QualityPanel } from "@/components/QualityPanel";
 import { Onboarding } from "@/components/Onboarding";
+import { SupportModal } from "@/components/SupportModal";
+import { PostDownloadModal } from "@/components/PostDownloadModal";
 import { Btn } from "@/components/ui";
 
 export default function Home() {
@@ -18,9 +20,18 @@ export default function Home() {
   const { prefs, hydrated, set, incFont, decFont } = useUiPrefs();
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<"editar" | "ver">("editar");
+  const [supportOpen, setSupportOpen] = useState(false);
+  const [postDownloadOpen, setPostDownloadOpen] = useState(false);
   const current = getTemplate(settings.templateId);
 
   const print = () => window.print();
+
+  // Após o usuário baixar/imprimir, abrir a vitrine de vagas (momento de conversão).
+  useEffect(() => {
+    const onAfterPrint = () => setPostDownloadOpen(true);
+    window.addEventListener("afterprint", onAfterPrint);
+    return () => window.removeEventListener("afterprint", onAfterPrint);
+  }, []);
   const showOnboarding = hydrated && !prefs.onboardingDone;
 
   return (
@@ -88,6 +99,13 @@ export default function Home() {
             <Btn variant="outline" onClick={() => setGalleryOpen(true)}>
               🎨 <span className="hidden sm:inline">Modelos</span>
             </Btn>
+            <button
+              onClick={() => setSupportOpen(true)}
+              className="rounded-lg px-2 py-1.5 text-sm text-rose-600 transition hover:bg-rose-50"
+              title="Apoiar o projeto"
+            >
+              ❤️ <span className="hidden md:inline">Apoiar</span>
+            </button>
             <Btn variant="primary" onClick={print}>
               ⬇ <span className="hidden sm:inline">Baixar PDF</span>
             </Btn>
@@ -208,6 +226,17 @@ export default function Home() {
           }}
         />
       )}
+
+      <SupportModal open={supportOpen} onClose={() => setSupportOpen(false)} />
+
+      <PostDownloadModal
+        open={postDownloadOpen}
+        onClose={() => setPostDownloadOpen(false)}
+        onSupport={() => {
+          setPostDownloadOpen(false);
+          setSupportOpen(true);
+        }}
+      />
     </div>
   );
 }
