@@ -28,6 +28,9 @@
 /.playwright-mcp
 *.png
 
+# SecondBrain — documentação pessoal local
+/CurriculoIoSecondBrain/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
