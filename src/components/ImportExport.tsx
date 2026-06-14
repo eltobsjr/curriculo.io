@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { ResumeData, ResumeSettings } from "@/lib/resume-schema";
 import { Lang } from "@/lib/i18n";
+import { useT } from "@/lib/i18n-ui";
 
 interface Props {
   content: Partial<Record<Lang, ResumeData>>;
@@ -17,6 +18,7 @@ interface Props {
 // Exporta o currículo (todos os idiomas) como .json e importa de volta.
 export function ImportExport({ content, settings, onImport }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const { t } = useT();
 
   const exportJson = () => {
     const blob = new Blob([JSON.stringify({ content, settings }, null, 2)], { type: "application/json" });
@@ -47,12 +49,12 @@ export function ImportExport({ content, settings, onImport }: Props) {
 
   return (
     <span className="inline-flex items-center gap-1">
-      <button onClick={exportJson} className="text-slate-500 hover:underline" title="Salvar uma cópia (.json)">
-        exportar
+      <button onClick={exportJson} className="text-slate-500 hover:underline" title=".json">
+        {t("editor.export")}
       </button>
       <span className="text-slate-300">·</span>
-      <button onClick={() => inputRef.current?.click()} className="text-slate-500 hover:underline" title="Carregar um .json">
-        importar
+      <button onClick={() => inputRef.current?.click()} className="text-slate-500 hover:underline" title=".json">
+        {t("editor.import")}
       </button>
       <input
         ref={inputRef}
