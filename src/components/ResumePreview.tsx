@@ -47,6 +47,8 @@ function computeBreakPoints(page: HTMLElement, totalHeight: number): number[] {
   return breaks;
 }
 
+const PAGE_GAP = 48; // px de recuo visual no início de cada nova página
+
 function PageBreakMarker({
   top,
   pageNum,
@@ -81,10 +83,14 @@ function PageBreakMarker({
         }}
       />
 
-      {/* Badge "Página N" logo abaixo da linha */}
+      {/* Faixa de respiro no topo da página seguinte: gradiente + badge centralizado */}
       <div
-        className="no-print pointer-events-none absolute left-0 right-0 z-20 flex justify-center"
-        style={{ top: top + 5 }}
+        className="no-print pointer-events-none absolute left-0 right-0 z-20 flex items-center justify-center"
+        style={{
+          top: top + 2,
+          height: PAGE_GAP,
+          background: "linear-gradient(to bottom, #f1f5f9 0%, transparent 100%)",
+        }}
       >
         <span className="rounded-full border border-indigo-200 bg-white px-2.5 py-[3px] text-[10px] font-medium text-indigo-500 shadow-sm">
           {pageLabel}
