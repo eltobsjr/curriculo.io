@@ -7,6 +7,7 @@ import { SAMPLE_RESUME, EMPTY_RESUME } from "./sample-data";
 import { translateResume } from "./translate";
 
 const STORAGE_KEY = "curriculo-io:document:v1";
+const ALL_LANGS: Lang[] = ["pt", "en", "es"];
 
 type Content = Partial<Record<Lang, ResumeData>>;
 
@@ -14,12 +15,8 @@ function withDefaults(data: Partial<ResumeData>): ResumeData {
   return { ...EMPTY_RESUME, ...data };
 }
 
-// Carrega do localStorage, migrando o formato antigo ({ data }) para multi-idioma ({ content }).
 function load(): ResumeDocument {
-  const fallback: ResumeDocument = {
-    content: { pt: SAMPLE_RESUME },
-    settings: DEFAULT_SETTINGS,
-  };
+  const fallback: ResumeDocument = { content: { pt: SAMPLE_RESUME }, settings: DEFAULT_SETTINGS };
   if (typeof window === "undefined") return fallback;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -27,24 +24,40 @@ function load(): ResumeDocument {
     const parsed = JSON.parse(raw);
     const settings: ResumeSettings = { ...DEFAULT_SETTINGS, ...parsed.settings };
 
-    // Formato novo (multi-idioma)
     if (parsed.content && typeof parsed.content === "object") {
       const content: Content = {};
-      for (const k of Object.keys(parsed.content) as Lang[]) {
-        content[k] = withDefaults(parsed.content[k]);
-      }
+      for (const k of Object.keys(parsed.content) as Lang[]) content[k] = withDefaults(parsed.content[k]);
       if (Object.keys(content).length === 0) content.pt = SAMPLE_RESUME;
       return { content, settings };
     }
 
-    // Formato antigo ({ data }) → migra para o idioma pt (ou o idioma salvo)
     if (parsed.data) {
       return { content: { [settings.language ?? "pt"]: withDefaults(parsed.data) }, settings };
     }
-  } catch {
-    /* ignore */
-  }
+  } catch { /* ignore */ }
   return fallback;
+}
+
+// Dispara tradução para os idiomas-alvo em paralelo, atualizando o estado conforme chegam.
+function runTranslations(
+  base: ResumeData,
+  from: Lang,
+  targets: Lang[],
+  setContent: React.Dispatch<React.SetStateAction<Content>>,
+  setIsTranslating: (v: boolean) => void,
+) {
+  if (targets.length === 0) return;
+  setIsTranslating(true);
+  Promise.all(
+    targets.map((target) =>
+      translateResume(base, from, target)
+        .then((translated) => setContent((prev) => ({ ...prev, [target]: translated })))
+        .catch(() => {
+          // fallback: copia o original se a API falhar
+          setContent((prev) => ({ ...prev, [target]: JSON.parse(JSON.stringify(base)) as ResumeData }));
+        })
+    )
+  ).finally(() => setIsTranslating(false));
 }
 
 export function useResume() {
@@ -61,28 +74,18 @@ export function useResume() {
     setHydrated(true);
   }, []);
 
-  // Persiste com debounce.
   useEffect(() => {
     if (!hydrated) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ content, settings }));
-      } catch {
-        /* quota cheia / privado */
-      }
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ content, settings })); }
+      catch { /* quota cheia */ }
     }, 400);
-    return () => {
-      if (saveTimer.current) clearTimeout(saveTimer.current);
-    };
+    return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
   }, [content, settings, hydrated]);
 
   const lang = settings.language ?? "pt";
-
-  // Conteúdo do idioma ativo (sempre definido).
   const data = useMemo(() => content[lang] ?? EMPTY_RESUME, [content, lang]);
-
-  // Idiomas que já têm conteúdo.
   const availableLangs = useMemo(() => Object.keys(content) as Lang[], [content]);
 
   const setData = useCallback(
@@ -107,34 +110,25 @@ export function useResume() {
     setSettings((prev) => ({ ...prev, ...patch }));
   }, []);
 
-  // Troca o idioma ativo. Se ainda não existe, semeia imediatamente com uma cópia
-  // e dispara a tradução automática em background via MyMemory.
+  // Troca o idioma. Se o conteúdo ainda não existe, semeia + traduz em background.
   const switchLanguage = useCallback(
     async (target: Lang) => {
-      if (content[target]) {
-        setSettings((prev) => ({ ...prev, language: target }));
-        return;
-      }
-      const from = lang;
-      const base: ResumeData = JSON.parse(JSON.stringify(content[from] ?? SAMPLE_RESUME));
-      // Mostra a cópia imediatamente para feedback instantâneo
-      setContent((prev) => ({ ...prev, [target]: base }));
+      // Troca imediatamente para feedback visual
       setSettings((prev) => ({ ...prev, language: target }));
-      // Traduz em background
-      setIsTranslating(true);
-      try {
-        const translated = await translateResume(base, from, target);
-        setContent((prev) => ({ ...prev, [target]: translated }));
-      } catch {
-        /* mantém a cópia se falhar */
-      } finally {
-        setIsTranslating(false);
-      }
+
+      if (content[target]) return; // já tem conteúdo, nada a fazer
+
+      const from = lang;
+      const base = JSON.parse(JSON.stringify(content[from] ?? SAMPLE_RESUME)) as ResumeData;
+
+      // Seed imediato — usuário já vê algo enquanto traduz
+      setContent((prev) => ({ ...prev, [target]: base }));
+
+      runTranslations(base, from, [target], setContent, setIsTranslating);
     },
     [content, lang],
   );
 
-  // Copia o conteúdo de outro idioma para o idioma ativo (sobrescreve).
   const copyFromLanguage = useCallback(
     (source: Lang) => {
       setContent((prev) => {
@@ -149,20 +143,37 @@ export function useResume() {
   const resetSample = useCallback(() => setData(SAMPLE_RESUME), [setData]);
   const clearAll = useCallback(() => setData(withDefaults({})), [setData]);
 
-  // Importa um documento (.json). Aceita o formato novo e o antigo.
+  // Importa JSON. Popula o idioma base e traduz automaticamente para EN e ES em paralelo.
   const loadDocument = useCallback(
     (doc: { content?: Content; data?: Partial<ResumeData>; settings?: Partial<ResumeSettings> }) => {
       if (doc.settings) setSettings((prev) => ({ ...prev, ...doc.settings }));
-      if (doc.content) {
+
+      let baseLang: Lang = "pt";
+      let baseData: ResumeData | undefined;
+
+      if (doc.content && Object.keys(doc.content).length > 0) {
         const c: Content = {};
         for (const k of Object.keys(doc.content) as Lang[]) c[k] = withDefaults(doc.content[k]!);
         setContent(c);
+
+        // Se já tem os 3 idiomas, nada a traduzir
+        if (ALL_LANGS.every((l) => !!c[l])) return;
+
+        baseLang = (doc.settings?.language as Lang) ?? (Object.keys(c)[0] as Lang) ?? "pt";
+        baseData = c[baseLang];
       } else if (doc.data) {
-        const target = (doc.settings?.language as Lang) ?? lang;
-        setContent((prev) => ({ ...prev, [target]: withDefaults(doc.data!) }));
+        baseLang = "pt"; // JSON antigo sempre assume PT como base
+        baseData = withDefaults(doc.data);
+        setContent({ [baseLang]: baseData });
       }
+
+      if (!baseData) return;
+
+      // Traduz para todos os idiomas que ainda não têm conteúdo
+      const targets = ALL_LANGS.filter((l) => l !== baseLang);
+      runTranslations(baseData, baseLang, targets, setContent, setIsTranslating);
     },
-    [lang],
+    [],
   );
 
   return {
