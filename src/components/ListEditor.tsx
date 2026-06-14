@@ -2,6 +2,7 @@
 
 import { ReactNode } from "react";
 import { Btn } from "./ui";
+import { useT } from "@/lib/i18n-ui";
 
 interface ListEditorProps<T> {
   items: T[];
@@ -21,6 +22,7 @@ export function ListEditor<T extends { id: string }>({
   render,
   itemTitle,
 }: ListEditorProps<T>) {
+  const { t } = useT();
   const update = (id: string, patch: Partial<T>) =>
     onChange(items.map((it) => (it.id === id ? { ...it, ...patch } : it)));
   const remove = (id: string) => onChange(items.filter((it) => it.id !== id));
@@ -45,7 +47,7 @@ export function ListEditor<T extends { id: string }>({
                 onClick={() => move(i, -1)}
                 disabled={i === 0}
                 className="rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-700 disabled:opacity-30"
-                title="Mover para cima"
+                title={t("list.moveUp")}
               >
                 ↑
               </button>
@@ -53,14 +55,14 @@ export function ListEditor<T extends { id: string }>({
                 onClick={() => move(i, 1)}
                 disabled={i === items.length - 1}
                 className="rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-700 disabled:opacity-30"
-                title="Mover para baixo"
+                title={t("list.moveDown")}
               >
                 ↓
               </button>
               <button
                 onClick={() => remove(item.id)}
                 className="rounded p-1 text-slate-400 hover:bg-red-50 hover:text-red-600"
-                title="Remover"
+                title={t("list.remove")}
               >
                 ✕
               </button>

@@ -18,7 +18,7 @@ export function EditorPanel({ data, update, showPhoto }: Props) {
     <div className="space-y-4">
       {SECTIONS.map((s) => (
         <SectionCard key={s.id} title={`${s.icon} ${t(`section.${s.id}.title`)}`}>
-          {s.render(data, update, showPhoto)}
+          {s.render(data, update, showPhoto, t)}
         </SectionCard>
       ))}
     </div>
