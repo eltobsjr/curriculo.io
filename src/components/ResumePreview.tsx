@@ -5,13 +5,12 @@ import { ResumeData, ResumeSettings } from "@/lib/resume-schema";
 import { getTemplate } from "@/templates/registry";
 import { useT } from "@/lib/i18n-ui";
 
-const A4_WIDTH = 794; // px
-const A4_HEIGHT = 1123; // px (altura de 1 página A4 em 96dpi)
+const A4_WIDTH = 794;
+const A4_HEIGHT = 1123;
 
 interface Props {
   data: ResumeData;
   settings: ResumeSettings;
-  // quando true, renderiza em tamanho real para impressão (sem escala).
   printMode?: boolean;
 }
 
@@ -21,17 +20,48 @@ const fontClass: Record<string, string> = {
   mono: "font-resume-mono",
 };
 
-// Marcador visual de quebra de página — aparece só no preview, nunca no PDF.
-function PageBreakMarker({ top, pageNum, continuesLabel, pageLabel }: {
+// Calcula onde a quebra de página realmente cai, evitando cortar seções no meio.
+// Para cada limite bruto de A4 (1123px × N), procura seções que cruzariam esse limite
+// e recua o ponto de quebra para antes delas — espelhando o break-inside:avoid do print.
+function computeBreakPoints(page: HTMLElement, totalHeight: number): number[] {
+  const numPages = Math.ceil(totalHeight / A4_HEIGHT);
+  if (numPages <= 1) return [];
+
+  const sections = Array.from(page.querySelectorAll("section")).map((el) => {
+    const e = el as HTMLElement;
+    return { top: e.offsetTop, bottom: e.offsetTop + e.offsetHeight };
+  });
+
+  const breaks: number[] = [];
+  for (let p = 1; p < numPages; p++) {
+    const rawBreak = p * A4_HEIGHT;
+    const straddling = sections.filter((s) => s.top < rawBreak && s.bottom > rawBreak);
+    if (straddling.length === 0) {
+      breaks.push(rawBreak);
+    } else {
+      // Usa o topo da seção mais próxima do limite como novo ponto de quebra
+      const toMove = straddling.reduce((a, b) => (a.top > b.top ? a : b));
+      breaks.push(toMove.top);
+    }
+  }
+  return breaks;
+}
+
+function PageBreakMarker({
+  top,
+  pageNum,
+  continuesLabel,
+  pageLabel,
+}: {
   top: number;
   pageNum: number;
   continuesLabel: string;
   pageLabel: string;
 }) {
-  void pageNum; // pageNum usado para key externa, não renderizado aqui
+  void pageNum;
   return (
     <>
-      {/* Badge "continua" no canto inferior direito da página anterior */}
+      {/* Badge "continua" no canto inferior direito, antes do limite */}
       <div
         className="no-print pointer-events-none absolute right-4 z-20 flex items-center"
         style={{ top: top - 26 }}
@@ -41,13 +71,17 @@ function PageBreakMarker({ top, pageNum, continuesLabel, pageLabel }: {
         </span>
       </div>
 
-      {/* Linha divisória no exato limite da página */}
+      {/* Linha divisória no limite ajustado */}
       <div
         className="no-print pointer-events-none absolute left-0 right-0 z-20"
-        style={{ top, height: 2, background: "linear-gradient(to right, #c7d2fe 0%, #818cf8 50%, #c7d2fe 100%)" }}
+        style={{
+          top,
+          height: 2,
+          background: "linear-gradient(to right, #c7d2fe 0%, #818cf8 50%, #c7d2fe 100%)",
+        }}
       />
 
-      {/* Badge "Página N" centralizado logo abaixo da linha */}
+      {/* Badge "Página N" logo abaixo da linha */}
       <div
         className="no-print pointer-events-none absolute left-0 right-0 z-20 flex justify-center"
         style={{ top: top + 5 }}
@@ -67,6 +101,7 @@ export function ResumePreview({ data, settings, printMode = false }: Props) {
   const pageRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [pageHeight, setPageHeight] = useState(A4_HEIGHT);
+  const [breakPoints, setBreakPoints] = useState<number[]>([]);
 
   // Largura disponível → fator de escala.
   useEffect(() => {
@@ -80,16 +115,19 @@ export function ResumePreview({ data, settings, printMode = false }: Props) {
     return () => ro.disconnect();
   }, [printMode]);
 
-  // Altura real da folha (cresce quando o conteúdo passa de uma página).
+  // Altura real + pontos de quebra ajustados para não cortar seções.
   useLayoutEffect(() => {
     if (printMode) return;
     const el = pageRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => {
-      setPageHeight(Math.max(A4_HEIGHT, el.offsetHeight));
-    });
+    const update = () => {
+      const h = Math.max(A4_HEIGHT, el.offsetHeight);
+      setPageHeight(h);
+      setBreakPoints(computeBreakPoints(el, h));
+    };
+    const ro = new ResizeObserver(update);
     ro.observe(el);
-    setPageHeight(Math.max(A4_HEIGHT, el.offsetHeight));
+    update();
     return () => ro.disconnect();
   }, [printMode, data, settings]);
 
@@ -103,11 +141,8 @@ export function ResumePreview({ data, settings, printMode = false }: Props) {
     );
   }
 
-  const numPages = Math.ceil(pageHeight / A4_HEIGHT);
-
   return (
     <div ref={wrapRef} className="w-full">
-      {/* Espaçador com a altura real escalada, para não cortar conteúdo. */}
       <div style={{ height: pageHeight * scale, width: A4_WIDTH * scale, margin: "0 auto" }}>
         <div
           className={fontClass[settings.fontFamily]}
@@ -116,17 +151,15 @@ export function ResumePreview({ data, settings, printMode = false }: Props) {
           <div ref={pageRef} className="a4-page shadow-xl" style={{ position: "relative" }}>
             <Template data={data} settings={settings} />
 
-            {/* Marcadores de quebra de página (só no preview) */}
-            {numPages > 1 &&
-              Array.from({ length: numPages - 1 }, (_, i) => (
-                <PageBreakMarker
-                  key={i}
-                  top={(i + 1) * A4_HEIGHT}
-                  pageNum={i + 2}
-                  continuesLabel={t("preview.continues")}
-                  pageLabel={t("preview.page", { n: i + 2 })}
-                />
-              ))}
+            {breakPoints.map((bp, i) => (
+              <PageBreakMarker
+                key={i}
+                top={bp}
+                pageNum={i + 2}
+                continuesLabel={t("preview.continues")}
+                pageLabel={t("preview.page", { n: i + 2 })}
+              />
+            ))}
           </div>
         </div>
       </div>
