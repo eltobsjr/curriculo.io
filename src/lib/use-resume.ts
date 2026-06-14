@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DEFAULT_SETTINGS, ResumeData, ResumeDocument, ResumeSettings } from "./resume-schema";
 import { Lang } from "./i18n";
 import { SAMPLE_RESUME, EMPTY_RESUME } from "./sample-data";
+import { translateResume } from "./translate";
 
 const STORAGE_KEY = "curriculo-io:document:v1";
 
@@ -50,6 +51,7 @@ export function useResume() {
   const [content, setContent] = useState<Content>({ pt: SAMPLE_RESUME });
   const [settings, setSettings] = useState<ResumeSettings>(DEFAULT_SETTINGS);
   const [hydrated, setHydrated] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -105,18 +107,31 @@ export function useResume() {
     setSettings((prev) => ({ ...prev, ...patch }));
   }, []);
 
-  // Troca o idioma ativo. Se o idioma ainda não existe, semeia com uma cópia do
-  // idioma atual (ponto de partida para você traduzir).
+  // Troca o idioma ativo. Se ainda não existe, semeia imediatamente com uma cópia
+  // e dispara a tradução automática em background via MyMemory.
   const switchLanguage = useCallback(
-    (target: Lang) => {
-      setContent((prev) => {
-        if (prev[target]) return prev;
-        const base = prev[lang] ?? SAMPLE_RESUME;
-        return { ...prev, [target]: JSON.parse(JSON.stringify(base)) as ResumeData };
-      });
+    async (target: Lang) => {
+      if (content[target]) {
+        setSettings((prev) => ({ ...prev, language: target }));
+        return;
+      }
+      const from = lang;
+      const base: ResumeData = JSON.parse(JSON.stringify(content[from] ?? SAMPLE_RESUME));
+      // Mostra a cópia imediatamente para feedback instantâneo
+      setContent((prev) => ({ ...prev, [target]: base }));
       setSettings((prev) => ({ ...prev, language: target }));
+      // Traduz em background
+      setIsTranslating(true);
+      try {
+        const translated = await translateResume(base, from, target);
+        setContent((prev) => ({ ...prev, [target]: translated }));
+      } catch {
+        /* mantém a cópia se falhar */
+      } finally {
+        setIsTranslating(false);
+      }
     },
-    [lang],
+    [content, lang],
   );
 
   // Copia o conteúdo de outro idioma para o idioma ativo (sobrescreve).
@@ -156,6 +171,7 @@ export function useResume() {
     hydrated,
     content,
     availableLangs,
+    isTranslating,
     setData,
     updateData,
     updateSettings,
