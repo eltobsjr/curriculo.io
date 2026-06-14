@@ -5,30 +5,27 @@ import { ResumeData, uid } from "@/lib/resume-schema";
 import { ACTION_VERBS, BULLET_TEMPLATES } from "@/lib/insights";
 import { Field, TextArea, TextInput } from "./ui";
 import { ListEditor } from "./ListEditor";
+import { useT } from "@/lib/i18n-ui";
+
+type TFn = (key: string, vars?: Record<string, string | number>) => string;
 
 export interface SectionDef {
   id: string;
-  title: string;
   icon: string;
-  help: string; // dica amigável exibida no topo da seção
-  render: (data: ResumeData, update: (patch: Partial<ResumeData>) => void, showPhoto: boolean) => ReactNode;
+  render: (data: ResumeData, update: (patch: Partial<ResumeData>) => void, showPhoto: boolean, t: TFn) => ReactNode;
 }
 
-// Assistente de escrita: chips de verbos de ação + frases-modelo que inserem texto.
 function WritingHelper({ onInsert }: { onInsert: (text: string) => void }) {
+  const { t } = useT();
   const [open, setOpen] = useState(false);
   return (
     <div className="mt-1.5">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="text-xs font-medium text-indigo-600 hover:underline"
-      >
-        ✨ Ajuda para escrever {open ? "▲" : "▼"}
+      <button type="button" onClick={() => setOpen((o) => !o)} className="text-xs font-medium text-indigo-600 hover:underline">
+        {t("helper.toggle")} {open ? "▲" : "▼"}
       </button>
       {open && (
         <div className="mt-2 rounded-lg border border-indigo-100 bg-indigo-50/60 p-2.5">
-          <p className="mb-1 text-[11px] font-medium text-slate-600">Comece com um verbo de ação:</p>
+          <p className="mb-1 text-[11px] font-medium text-slate-600">{t("helper.verbs")}</p>
           <div className="flex flex-wrap gap-1">
             {ACTION_VERBS.map((v) => (
               <button
@@ -41,16 +38,16 @@ function WritingHelper({ onInsert }: { onInsert: (text: string) => void }) {
               </button>
             ))}
           </div>
-          <p className="mb-1 mt-2.5 text-[11px] font-medium text-slate-600">Ou use um modelo de frase:</p>
+          <p className="mb-1 mt-2.5 text-[11px] font-medium text-slate-600">{t("helper.templates")}</p>
           <div className="space-y-1">
-            {BULLET_TEMPLATES.map((t) => (
+            {BULLET_TEMPLATES.map((tmpl) => (
               <button
-                key={t}
+                key={tmpl}
                 type="button"
-                onClick={() => onInsert(t)}
+                onClick={() => onInsert(tmpl)}
                 className="block w-full rounded border border-slate-200 bg-white px-2 py-1 text-left text-[11px] text-slate-600 hover:border-indigo-300"
               >
-                {t}
+                {tmpl}
               </button>
             ))}
           </div>
@@ -63,10 +60,8 @@ function WritingHelper({ onInsert }: { onInsert: (text: string) => void }) {
 export const SECTIONS: SectionDef[] = [
   {
     id: "pessoal",
-    title: "Dados pessoais",
     icon: "👤",
-    help: "Comece pelo essencial: seu nome, o cargo que busca e como te encontrar.",
-    render: (data, update, showPhoto) => {
+    render: (data, update, showPhoto, t) => {
       const onPhoto = (file?: File) => {
         if (!file) return;
         const reader = new FileReader();
@@ -76,66 +71,66 @@ export const SECTIONS: SectionDef[] = [
       return (
         <div className="space-y-3">
           {showPhoto && (
-            <Field label="Foto (opcional)">
+            <Field label={t("field.photo")}>
               <div className="flex items-center gap-3">
                 {data.photoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={data.photoUrl} alt="" className="h-14 w-14 rounded-full object-cover" />
                 ) : (
                   <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-xs text-slate-400">
-                    sem foto
+                    {t("field.noPhoto")}
                   </div>
                 )}
                 <input
                   type="file"
                   accept="image/*"
-                  aria-label="Enviar foto"
+                  aria-label={t("field.uploadPhoto")}
                   onChange={(e) => onPhoto(e.target.files?.[0])}
                   className="text-xs text-slate-500 file:mr-2 file:rounded-md file:border-0 file:bg-indigo-50 file:px-2 file:py-1 file:text-indigo-600"
                 />
                 {data.photoUrl && (
                   <button onClick={() => update({ photoUrl: "" })} className="text-xs text-red-500 hover:underline">
-                    remover
+                    {t("field.removePhoto")}
                   </button>
                 )}
               </div>
             </Field>
           )}
           <div className="grid gap-3 sm:grid-cols-2">
-            <Field label="Nome completo">
-              <TextInput value={data.fullName} onChange={(e) => update({ fullName: e.target.value })} placeholder="Ana Martins" />
+            <Field label={t("field.fullName")}>
+              <TextInput value={data.fullName} onChange={(e) => update({ fullName: e.target.value })} placeholder={t("ph.fullName")} />
             </Field>
-            <Field label="Título / Cargo-alvo">
-              <TextInput value={data.headline} onChange={(e) => update({ headline: e.target.value })} placeholder="Desenvolvedora Front-end" />
-            </Field>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Field label="E-mail">
-              <TextInput type="email" value={data.email} onChange={(e) => update({ email: e.target.value })} placeholder="voce@email.com" />
-            </Field>
-            <Field label="Telefone">
-              <TextInput value={data.phone} onChange={(e) => update({ phone: e.target.value })} placeholder="(11) 90000-0000" />
+            <Field label={t("field.headline")}>
+              <TextInput value={data.headline} onChange={(e) => update({ headline: e.target.value })} placeholder={t("ph.headline")} />
             </Field>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            <Field label="Localização">
-              <TextInput value={data.location} onChange={(e) => update({ location: e.target.value })} placeholder="São Paulo, SP" />
+            <Field label={t("field.email")}>
+              <TextInput type="email" value={data.email} onChange={(e) => update({ email: e.target.value })} placeholder={t("ph.email")} />
             </Field>
-            <Field label="Site / Portfólio (opcional)">
-              <TextInput value={data.website ?? ""} onChange={(e) => update({ website: e.target.value })} placeholder="seusite.com" />
+            <Field label={t("field.phone")}>
+              <TextInput value={data.phone} onChange={(e) => update({ phone: e.target.value })} placeholder={t("ph.phone")} />
             </Field>
           </div>
-          <Field label="Links e redes (opcional)">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label={t("field.location")}>
+              <TextInput value={data.location} onChange={(e) => update({ location: e.target.value })} placeholder={t("ph.location")} />
+            </Field>
+            <Field label={t("field.website")}>
+              <TextInput value={data.website ?? ""} onChange={(e) => update({ website: e.target.value })} placeholder={t("ph.website")} />
+            </Field>
+          </div>
+          <Field label={t("field.socialLinks")}>
             <ListEditor
               items={data.socials}
               onChange={(socials) => update({ socials })}
               create={() => ({ id: uid(), label: "", url: "" })}
-              addLabel="Adicionar link"
-              itemTitle={(s) => s.label || "Link"}
+              addLabel={t("list.addLink")}
+              itemTitle={(s) => s.label || t("list.link")}
               render={(s, set) => (
                 <div className="grid grid-cols-[110px_1fr] gap-2">
-                  <TextInput value={s.label} onChange={(e) => set({ label: e.target.value })} placeholder="LinkedIn" />
-                  <TextInput value={s.url} onChange={(e) => set({ url: e.target.value })} placeholder="linkedin.com/in/voce" />
+                  <TextInput value={s.label} onChange={(e) => set({ label: e.target.value })} placeholder={t("ph.socialLabel")} />
+                  <TextInput value={s.url} onChange={(e) => set({ url: e.target.value })} placeholder={t("ph.socialUrl")} />
                 </div>
               )}
             />
@@ -146,46 +141,38 @@ export const SECTIONS: SectionDef[] = [
   },
   {
     id: "resumo",
-    title: "Resumo profissional",
     icon: "📝",
-    help: "Em 2–3 frases, diga quem você é, sua experiência e o que procura. É a primeira coisa que leem.",
-    render: (data, update) => (
-      <TextArea
-        value={data.summary}
-        onChange={(e) => update({ summary: e.target.value })}
-        placeholder="Ex.: Desenvolvedora front-end com 7 anos de experiência criando interfaces acessíveis com React. Busco liderar projetos de produto com foco em qualidade."
-      />
+    render: (data, update, _showPhoto, t) => (
+      <TextArea value={data.summary} onChange={(e) => update({ summary: e.target.value })} placeholder={t("ph.summary")} />
     ),
   },
   {
     id: "experiencia",
-    title: "Experiência profissional",
     icon: "💼",
-    help: "Liste seus empregos do mais recente ao mais antigo. Em cada um, descreva conquistas (não só tarefas).",
-    render: (data, update) => (
+    render: (data, update, _showPhoto, t) => (
       <ListEditor
         items={data.experiences}
         onChange={(experiences) => update({ experiences })}
         create={() => ({ id: uid(), role: "", company: "", location: "", startDate: "", endDate: "", description: "" })}
-        addLabel="Adicionar experiência"
-        itemTitle={(e) => e.role || e.company || "Nova experiência"}
+        addLabel={t("list.addExp")}
+        itemTitle={(e) => e.role || e.company || t("list.newExp")}
         render={(e, set) => (
           <div className="space-y-2">
             <div className="grid grid-cols-2 gap-2">
-              <TextInput value={e.role} onChange={(ev) => set({ role: ev.target.value })} placeholder="Cargo" />
-              <TextInput value={e.company} onChange={(ev) => set({ company: ev.target.value })} placeholder="Empresa" />
+              <TextInput value={e.role} onChange={(ev) => set({ role: ev.target.value })} placeholder={t("ph.role")} />
+              <TextInput value={e.company} onChange={(ev) => set({ company: ev.target.value })} placeholder={t("ph.company")} />
             </div>
             <div className="grid grid-cols-3 gap-2">
-              <TextInput value={e.location ?? ""} onChange={(ev) => set({ location: ev.target.value })} placeholder="Local" />
-              <TextInput value={e.startDate} onChange={(ev) => set({ startDate: ev.target.value })} placeholder="Início" />
-              <TextInput value={e.endDate} onChange={(ev) => set({ endDate: ev.target.value })} placeholder="Fim / Atual" />
+              <TextInput value={e.location ?? ""} onChange={(ev) => set({ location: ev.target.value })} placeholder={t("ph.city")} />
+              <TextInput value={e.startDate} onChange={(ev) => set({ startDate: ev.target.value })} placeholder={t("ph.startDate")} />
+              <TextInput value={e.endDate} onChange={(ev) => set({ endDate: ev.target.value })} placeholder={t("ph.endDate")} />
             </div>
             <TextArea
               value={e.description ?? ""}
               onChange={(ev) => set({ description: ev.target.value })}
-              placeholder="Uma conquista por linha. Ex.: Aumentou a conversão mobile em 18%."
+              placeholder={t("ph.expDesc")}
             />
-            <WritingHelper onInsert={(t) => set({ description: (e.description ? e.description + "\n" : "") + t })} />
+            <WritingHelper onInsert={(text) => set({ description: (e.description ? e.description + "\n" : "") + text })} />
           </div>
         )}
       />
@@ -193,26 +180,24 @@ export const SECTIONS: SectionDef[] = [
   },
   {
     id: "formacao",
-    title: "Formação acadêmica",
     icon: "🎓",
-    help: "Curso, instituição e período. Pode incluir cursos técnicos e bootcamps.",
-    render: (data, update) => (
+    render: (data, update, _showPhoto, t) => (
       <ListEditor
         items={data.education}
         onChange={(education) => update({ education })}
         create={() => ({ id: uid(), degree: "", institution: "", location: "", startDate: "", endDate: "", description: "" })}
-        addLabel="Adicionar formação"
-        itemTitle={(e) => e.degree || e.institution || "Nova formação"}
+        addLabel={t("list.addEdu")}
+        itemTitle={(e) => e.degree || e.institution || t("list.newEdu")}
         render={(e, set) => (
           <div className="space-y-2">
             <div className="grid grid-cols-2 gap-2">
-              <TextInput value={e.degree} onChange={(ev) => set({ degree: ev.target.value })} placeholder="Curso / Grau" />
-              <TextInput value={e.institution} onChange={(ev) => set({ institution: ev.target.value })} placeholder="Instituição" />
+              <TextInput value={e.degree} onChange={(ev) => set({ degree: ev.target.value })} placeholder={t("ph.degree")} />
+              <TextInput value={e.institution} onChange={(ev) => set({ institution: ev.target.value })} placeholder={t("ph.institution")} />
             </div>
             <div className="grid grid-cols-3 gap-2">
-              <TextInput value={e.location ?? ""} onChange={(ev) => set({ location: ev.target.value })} placeholder="Local" />
-              <TextInput value={e.startDate} onChange={(ev) => set({ startDate: ev.target.value })} placeholder="Início" />
-              <TextInput value={e.endDate} onChange={(ev) => set({ endDate: ev.target.value })} placeholder="Fim" />
+              <TextInput value={e.location ?? ""} onChange={(ev) => set({ location: ev.target.value })} placeholder={t("ph.city")} />
+              <TextInput value={e.startDate} onChange={(ev) => set({ startDate: ev.target.value })} placeholder={t("ph.startDate")} />
+              <TextInput value={e.endDate} onChange={(ev) => set({ endDate: ev.target.value })} placeholder={t("ph.endDateEdu")} />
             </div>
           </div>
         )}
@@ -221,21 +206,19 @@ export const SECTIONS: SectionDef[] = [
   },
   {
     id: "competencias",
-    title: "Competências",
     icon: "⚡",
-    help: "Suas principais habilidades. O sistema de triagem (ATS) procura por elas — capriche!",
-    render: (data, update) => (
+    render: (data, update, _showPhoto, t) => (
       <ListEditor
         items={data.skills}
         onChange={(skills) => update({ skills })}
         create={() => ({ id: uid(), name: "", level: 3 })}
-        addLabel="Adicionar competência"
-        itemTitle={(s) => s.name || "Competência"}
+        addLabel={t("list.addSkill")}
+        itemTitle={(s) => s.name || t("list.skill")}
         render={(s, set) => (
           <div className="grid grid-cols-[1fr_140px] items-center gap-2">
-            <TextInput value={s.name} onChange={(e) => set({ name: e.target.value })} placeholder="React" />
+            <TextInput value={s.name} onChange={(e) => set({ name: e.target.value })} placeholder={t("ph.skillName")} />
             <label className="flex items-center gap-2 text-xs text-slate-500">
-              Nível
+              {t("field.skillLevel")}
               <input
                 type="range"
                 min={1}
@@ -243,7 +226,7 @@ export const SECTIONS: SectionDef[] = [
                 value={s.level ?? 3}
                 onChange={(e) => set({ level: Number(e.target.value) })}
                 className="flex-1 accent-indigo-600"
-                aria-label="Nível da competência"
+                aria-label={t("field.skillLevel")}
               />
             </label>
           </div>
@@ -253,20 +236,18 @@ export const SECTIONS: SectionDef[] = [
   },
   {
     id: "idiomas",
-    title: "Idiomas",
     icon: "🌍",
-    help: "Idiomas que você fala e o nível (Nativo, Fluente, Intermediário, Básico).",
-    render: (data, update) => (
+    render: (data, update, _showPhoto, t) => (
       <ListEditor
         items={data.languages}
         onChange={(languages) => update({ languages })}
-        create={() => ({ id: uid(), name: "", level: "Intermediário" })}
-        addLabel="Adicionar idioma"
-        itemTitle={(l) => l.name || "Idioma"}
+        create={() => ({ id: uid(), name: "", level: t("ph.langLevel") })}
+        addLabel={t("list.addLang")}
+        itemTitle={(l) => l.name || t("list.lang")}
         render={(l, set) => (
           <div className="grid grid-cols-2 gap-2">
-            <TextInput value={l.name} onChange={(e) => set({ name: e.target.value })} placeholder="Inglês" />
-            <TextInput value={l.level} onChange={(e) => set({ level: e.target.value })} placeholder="Fluente" />
+            <TextInput value={l.name} onChange={(e) => set({ name: e.target.value })} placeholder={t("ph.langName")} />
+            <TextInput value={l.level} onChange={(e) => set({ level: e.target.value })} placeholder={t("ph.langLevel")} />
           </div>
         )}
       />
@@ -274,23 +255,21 @@ export const SECTIONS: SectionDef[] = [
   },
   {
     id: "projetos",
-    title: "Projetos (opcional)",
     icon: "🚀",
-    help: "Projetos pessoais, freelances ou trabalhos voluntários que mostram seu valor.",
-    render: (data, update) => (
+    render: (data, update, _showPhoto, t) => (
       <ListEditor
         items={data.projects}
         onChange={(projects) => update({ projects })}
         create={() => ({ id: uid(), name: "", url: "", description: "" })}
-        addLabel="Adicionar projeto"
-        itemTitle={(p) => p.name || "Projeto"}
+        addLabel={t("list.addProject")}
+        itemTitle={(p) => p.name || t("list.project")}
         render={(p, set) => (
           <div className="space-y-2">
             <div className="grid grid-cols-2 gap-2">
-              <TextInput value={p.name} onChange={(e) => set({ name: e.target.value })} placeholder="Nome do projeto" />
-              <TextInput value={p.url ?? ""} onChange={(e) => set({ url: e.target.value })} placeholder="link" />
+              <TextInput value={p.name} onChange={(e) => set({ name: e.target.value })} placeholder={t("ph.projectName")} />
+              <TextInput value={p.url ?? ""} onChange={(e) => set({ url: e.target.value })} placeholder={t("ph.projectUrl")} />
             </div>
-            <TextArea value={p.description ?? ""} onChange={(e) => set({ description: e.target.value })} placeholder="Breve descrição" />
+            <TextArea value={p.description ?? ""} onChange={(e) => set({ description: e.target.value })} placeholder={t("ph.projectDesc")} />
           </div>
         )}
       />
@@ -298,21 +277,19 @@ export const SECTIONS: SectionDef[] = [
   },
   {
     id: "certificacoes",
-    title: "Certificações (opcional)",
     icon: "🏅",
-    help: "Cursos e certificados relevantes para a vaga.",
-    render: (data, update) => (
+    render: (data, update, _showPhoto, t) => (
       <ListEditor
         items={data.certifications}
         onChange={(certifications) => update({ certifications })}
         create={() => ({ id: uid(), name: "", issuer: "", date: "" })}
-        addLabel="Adicionar certificação"
-        itemTitle={(c) => c.name || "Certificação"}
+        addLabel={t("list.addCert")}
+        itemTitle={(c) => c.name || t("list.cert")}
         render={(c, set) => (
           <div className="grid grid-cols-[1fr_1fr_90px] gap-2">
-            <TextInput value={c.name} onChange={(e) => set({ name: e.target.value })} placeholder="Certificação" />
-            <TextInput value={c.issuer ?? ""} onChange={(e) => set({ issuer: e.target.value })} placeholder="Emissor" />
-            <TextInput value={c.date ?? ""} onChange={(e) => set({ date: e.target.value })} placeholder="Ano" />
+            <TextInput value={c.name} onChange={(e) => set({ name: e.target.value })} placeholder={t("ph.certName")} />
+            <TextInput value={c.issuer ?? ""} onChange={(e) => set({ issuer: e.target.value })} placeholder={t("ph.certIssuer")} />
+            <TextInput value={c.date ?? ""} onChange={(e) => set({ date: e.target.value })} placeholder={t("ph.certYear")} />
           </div>
         )}
       />
