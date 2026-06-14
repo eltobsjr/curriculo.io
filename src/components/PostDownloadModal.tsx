@@ -1,6 +1,7 @@
 "use client";
 
 import { JOB_BOARDS, isPixConfigured } from "@/lib/monetization";
+import { useT } from "@/lib/i18n-ui";
 
 interface Props {
   open: boolean;
@@ -11,6 +12,7 @@ interface Props {
 // Aparece logo após o usuário baixar o PDF — o melhor momento de conversão.
 // Mostra vagas (links de afiliado) e um convite discreto para apoiar.
 export function PostDownloadModal({ open, onClose, onSupport }: Props) {
+  const { t } = useT();
   if (!open) return null;
 
   return (
@@ -18,10 +20,8 @@ export function PostDownloadModal({ open, onClose, onSupport }: Props) {
       <div className="ui-scaled w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="text-center">
           <div className="text-4xl">🎉</div>
-          <h2 className="mt-2 text-xl font-bold text-slate-900">Currículo pronto!</h2>
-          <p className="mt-1 text-sm text-slate-600">
-            Agora dê o próximo passo: estas vagas estão esperando o seu currículo.
-          </p>
+          <h2 className="mt-2 text-xl font-bold text-slate-900">{t("post.title")}</h2>
+          <p className="mt-1 text-sm text-slate-600">{t("post.subtitle")}</p>
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -42,21 +42,21 @@ export function PostDownloadModal({ open, onClose, onSupport }: Props) {
 
         {isPixConfigured() && (
           <div className="mt-5 flex items-center justify-between gap-3 rounded-xl bg-rose-50 p-3">
-            <span className="text-sm text-rose-900">❤️ Gostou? Apoie o projeto com um Pix.</span>
+            <span className="text-sm text-rose-900">{t("post.supportCta")}</span>
             <button
               onClick={onSupport}
               className="shrink-0 rounded-lg bg-rose-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-rose-700"
             >
-              Apoiar
+              {t("post.support")}
             </button>
           </div>
         )}
 
         <button onClick={onClose} className="mt-4 w-full rounded-lg py-2 text-center text-sm text-slate-500 hover:bg-slate-100">
-          Continuar editando
+          {t("post.keepEditing")}
         </button>
 
-        <p className="mt-2 text-center text-[10px] text-slate-300">Alguns links podem ser patrocinados.</p>
+        <p className="mt-2 text-center text-[10px] text-slate-300">{t("post.sponsored")}</p>
       </div>
     </div>
   );
