@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Lora, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { I18nProvider } from "@/lib/i18n-ui";
 
 // Fontes usadas pelos templates (sans / serif / mono).
 const inter = Inter({ variable: "--font-sans", subsets: ["latin"] });
@@ -46,7 +47,9 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${inter.variable} ${lora.variable} ${jetbrains.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-slate-100 text-slate-900">{children}</body>
+      <body className="min-h-full bg-slate-100 text-slate-900">
+        <I18nProvider>{children}</I18nProvider>
+      </body>
     </html>
   );
 }
