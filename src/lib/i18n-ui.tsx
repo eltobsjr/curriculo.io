@@ -21,6 +21,7 @@ const PT: Dict = {
   "header.resumeFont": "Fonte do currículo",
   "header.resumeLanguage": "Idioma do currículo",
   "header.uiLanguage": "Idioma do app",
+  "header.translateAuto": "traduzir automaticamente",
   // banner
   "banner.free": "100% grátis",
   "banner.noSignup": "Sem cadastro",
@@ -128,6 +129,7 @@ const EN: Dict = {
   "header.resumeFont": "Resume font",
   "header.resumeLanguage": "Resume language",
   "header.uiLanguage": "App language",
+  "header.translateAuto": "auto-translate",
   "banner.free": "100% free",
   "banner.noSignup": "No sign-up",
   "banner.noWatermark": "No watermark",
@@ -222,6 +224,7 @@ const ES: Dict = {
   "header.resumeFont": "Fuente del currículum",
   "header.resumeLanguage": "Idioma del currículum",
   "header.uiLanguage": "Idioma de la app",
+  "header.translateAuto": "traducir automáticamente",
   "banner.free": "100% gratis",
   "banner.noSignup": "Sin registro",
   "banner.noWatermark": "Sin marca de agua",

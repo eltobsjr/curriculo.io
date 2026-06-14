@@ -6,6 +6,7 @@ import { useResume } from "@/lib/use-resume";
 import { useUiPrefs } from "@/lib/use-ui-prefs";
 import { ACCENT_PRESETS, FONT_OPTIONS } from "@/lib/resume-schema";
 import { LANGUAGES } from "@/lib/i18n";
+import { useT, UI_LANGUAGES } from "@/lib/i18n-ui";
 import { getTemplate } from "@/templates/registry";
 import { EditorPanel } from "@/components/EditorPanel";
 import { GuidedEditor } from "@/components/GuidedEditor";
@@ -19,9 +20,10 @@ import { PostDownloadModal } from "@/components/PostDownloadModal";
 import { Btn } from "@/components/ui";
 
 export default function Home() {
-  const { data, settings, content, availableLangs, updateData, updateSettings, switchLanguage, resetSample, clearAll, loadDocument } =
+  const { data, settings, content, availableLangs, isTranslating, updateData, updateSettings, switchLanguage, resetSample, clearAll, loadDocument } =
     useResume();
   const { prefs, hydrated, set, incFont, decFont } = useUiPrefs();
+  const { t, lang: uiLang, setLang: setUiLang } = useT();
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<"editar" | "ver">("editar");
   const [supportOpen, setSupportOpen] = useState(false);
@@ -53,12 +55,12 @@ export default function Home() {
 
           <div className="flex flex-wrap items-center gap-2">
             {/* Acessibilidade: tamanho da fonte */}
-            <div className="flex items-center rounded-lg border border-slate-300" title="Tamanho da fonte da interface">
-              <button onClick={decFont} aria-label="Diminuir fonte" className="px-2 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100">
+            <div className="flex items-center rounded-lg border border-slate-300" title={t("header.fontSize")}>
+              <button onClick={decFont} aria-label={t("header.decreaseFont")} className="px-2 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100">
                 A−
               </button>
               <span className="w-9 text-center text-[11px] text-slate-400">{Math.round(prefs.fontScale * 100)}%</span>
-              <button onClick={incFont} aria-label="Aumentar fonte" className="px-2 py-1.5 text-base font-bold text-slate-600 hover:bg-slate-100">
+              <button onClick={incFont} aria-label={t("header.increaseFont")} className="px-2 py-1.5 text-base font-bold text-slate-600 hover:bg-slate-100">
                 A+
               </button>
             </div>
@@ -89,7 +91,7 @@ export default function Home() {
             <select
               value={settings.fontFamily}
               onChange={(e) => updateSettings({ fontFamily: e.target.value as typeof settings.fontFamily })}
-              aria-label="Fonte do currículo"
+              aria-label={t("header.resumeFont")}
               className="hidden rounded-lg border border-slate-300 px-2 py-1.5 text-xs text-slate-700 sm:block"
             >
               {FONT_OPTIONS.map((f) => (
@@ -99,59 +101,84 @@ export default function Home() {
               ))}
             </select>
 
-            {/* Idioma do currículo */}
-            <div className="flex items-center rounded-lg border border-slate-300" title="Idioma do currículo">
-              {LANGUAGES.map((l) => (
-                <button
-                  key={l.code}
-                  onClick={() => switchLanguage(l.code)}
-                  aria-label={`Currículo em ${l.label}`}
-                  title={availableLangs.includes(l.code) ? l.label : `${l.label} (criar a partir do atual)`}
-                  className={`px-2 py-1.5 text-sm transition ${
-                    settings.language === l.code ? "bg-indigo-600 text-white" : "text-slate-600 hover:bg-slate-100"
-                  } ${availableLangs.includes(l.code) || settings.language === l.code ? "" : "opacity-50"} first:rounded-l-md last:rounded-r-md`}
-                >
-                  {l.flag}
-                </button>
+            {/* Idioma da interface */}
+            <select
+              value={uiLang}
+              onChange={(e) => setUiLang(e.target.value as typeof uiLang)}
+              aria-label={t("header.uiLanguage")}
+              title={t("header.uiLanguage")}
+              className="rounded-lg border border-slate-300 px-1.5 py-1.5 text-sm text-slate-700"
+            >
+              {UI_LANGUAGES.map((l) => (
+                <option key={l.code} value={l.code}>
+                  {l.flag} {l.code.toUpperCase()}
+                </option>
               ))}
+            </select>
+
+            {/* Idioma do currículo */}
+            <div className="flex items-center rounded-lg border border-slate-300" title={t("header.resumeLanguage")}>
+              {LANGUAGES.map((l) => {
+                const isActive = settings.language === l.code;
+                const hasContent = availableLangs.includes(l.code);
+                const isLoading = isTranslating && isActive;
+                return (
+                  <button
+                    key={l.code}
+                    onClick={() => switchLanguage(l.code)}
+                    disabled={isTranslating}
+                    aria-label={`${t("header.resumeLanguage")}: ${l.label}`}
+                    title={hasContent ? l.label : `${l.label} — ${t("header.translateAuto")}`}
+                    className={`relative px-2 py-1.5 text-sm transition ${
+                      isActive ? "bg-indigo-600 text-white" : "text-slate-600 hover:bg-slate-100"
+                    } ${hasContent || isActive ? "" : "opacity-50"} first:rounded-l-md last:rounded-r-md`}
+                  >
+                    {isLoading ? (
+                      <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    ) : (
+                      l.flag
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
             <Btn variant="outline" onClick={() => setGalleryOpen(true)}>
-              🎨 <span className="hidden sm:inline">Modelos</span>
+              🎨 <span className="hidden sm:inline">{t("header.templates")}</span>
             </Btn>
             <button
               onClick={() => setSupportOpen(true)}
               className="rounded-lg px-2 py-1.5 text-sm text-rose-600 transition hover:bg-rose-50"
-              title="Apoiar o projeto"
+              title={t("header.support")}
             >
-              ❤️ <span className="hidden md:inline">Apoiar</span>
+              ❤️ <span className="hidden md:inline">{t("header.support")}</span>
             </button>
             <Btn variant="primary" onClick={print}>
-              ⬇ <span className="hidden sm:inline">Baixar PDF</span>
+              ⬇ <span className="hidden sm:inline">{t("header.downloadPdf")}</span>
             </Btn>
           </div>
         </div>
 
         {/* Banner de confiança */}
         <div className="flex items-center justify-center gap-x-4 gap-y-0.5 overflow-x-auto whitespace-nowrap border-t border-slate-100 bg-emerald-50/60 px-3 py-1 text-[11px] font-medium text-emerald-700">
-          <span>✓ 100% grátis</span>
-          <span>✓ Sem cadastro</span>
-          <span>✓ Sem marca d&apos;água</span>
-          <span className="hidden sm:inline">✓ Seus dados ficam só no seu navegador</span>
+          <span>✓ {t("banner.free")}</span>
+          <span>✓ {t("banner.noSignup")}</span>
+          <span>✓ {t("banner.noWatermark")}</span>
+          <span className="hidden sm:inline">✓ {t("banner.dataLocal")}</span>
         </div>
       </header>
 
       {/* ===== Abas (apenas no celular) ===== */}
       <div className="no-print flex border-b border-slate-200 bg-white lg:hidden">
-        {(["editar", "ver"] as const).map((t) => (
+        {(["editar", "ver"] as const).map((tab) => (
           <button
-            key={t}
-            onClick={() => setMobileTab(t)}
+            key={tab}
+            onClick={() => setMobileTab(tab)}
             className={`flex-1 py-2.5 text-sm font-medium ${
-              mobileTab === t ? "border-b-2 border-indigo-600 text-indigo-600" : "text-slate-500"
+              mobileTab === tab ? "border-b-2 border-indigo-600 text-indigo-600" : "text-slate-500"
             }`}
           >
-            {t === "editar" ? "✏️ Editar" : "👁️ Visualizar"}
+            {tab === "editar" ? t("tabs.edit") : t("tabs.preview")}
           </button>
         ))}
       </div>
@@ -173,24 +200,24 @@ export default function Home() {
                   onClick={() => set({ mode: "guiado" })}
                   className={`rounded-md px-3 py-1.5 font-medium ${prefs.mode === "guiado" ? "bg-indigo-600 text-white" : "text-slate-600"}`}
                 >
-                  🧭 Guiado
+                  {t("editor.guided")}
                 </button>
                 <button
                   onClick={() => set({ mode: "avancado" })}
                   className={`rounded-md px-3 py-1.5 font-medium ${prefs.mode === "avancado" ? "bg-indigo-600 text-white" : "text-slate-600"}`}
                 >
-                  ⚡ Avançado
+                  {t("editor.advanced")}
                 </button>
               </div>
               <div className="flex flex-wrap items-center gap-1 text-xs">
                 <button onClick={resetSample} className="text-slate-500 hover:underline">
-                  exemplo
+                  {t("editor.example")}
                 </button>
                 <span className="text-slate-300">·</span>
                 <ImportExport content={content} settings={settings} onImport={loadDocument} />
                 <span className="text-slate-300">·</span>
                 <button onClick={clearAll} className="text-red-500 hover:underline">
-                  limpar
+                  {t("editor.clear")}
                 </button>
               </div>
             </div>
@@ -210,7 +237,7 @@ export default function Home() {
             )}
           </div>
 
-          <p className="mt-4 text-center text-[11px] text-slate-400">💾 Salvo automaticamente no seu navegador.</p>
+          <p className="mt-4 text-center text-[11px] text-slate-400">{t("editor.autosaved")}</p>
         </div>
 
         {/* Preview */}
