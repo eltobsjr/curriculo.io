@@ -89,7 +89,10 @@ body {
 @media print {
   @page {
     size: A4;
-    margin: 0;
+    margin: 10mm 0 0 0; /* recuo superior nas páginas 2+ */
+  }
+  @page :first {
+    margin: 0; /* página 1 usa o espaço total — o template define seu próprio padding */
   }
   html,
   body {
