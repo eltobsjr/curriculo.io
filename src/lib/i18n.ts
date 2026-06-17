@@ -19,6 +19,7 @@ export interface SectionLabels {
   languages: string;
   projects: string;
   certifications: string;
+  publications: string;
   contact: string;
 }
 
@@ -32,6 +33,7 @@ const LABELS: Record<Lang, SectionLabels> = {
     languages: "Idiomas",
     projects: "Projetos",
     certifications: "Certificações",
+    publications: "Publicações",
     contact: "Contato",
   },
   en: {
@@ -43,6 +45,7 @@ const LABELS: Record<Lang, SectionLabels> = {
     languages: "Languages",
     projects: "Projects",
     certifications: "Certifications",
+    publications: "Publications",
     contact: "Contact",
   },
   es: {
@@ -54,6 +57,7 @@ const LABELS: Record<Lang, SectionLabels> = {
     languages: "Idiomas",
     projects: "Proyectos",
     certifications: "Certificaciones",
+    publications: "Publicaciones",
     contact: "Contacto",
   },
 };

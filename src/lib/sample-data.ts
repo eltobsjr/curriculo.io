@@ -78,6 +78,7 @@ export const SAMPLE_RESUME: ResumeData = {
       date: "2023",
     },
   ],
+  publications: [],
 };
 
 // Currículo em branco (quando o usuário começa do zero).
@@ -97,4 +98,5 @@ export const EMPTY_RESUME: ResumeData = {
   skills: [],
   languages: [],
   certifications: [],
+  publications: [],
 };

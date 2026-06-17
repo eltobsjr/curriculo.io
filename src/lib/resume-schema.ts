@@ -57,6 +57,16 @@ export interface CertificationItem {
   date?: string;
 }
 
+// Produção bibliográfica (artigos, livros, capítulos, trabalhos em eventos).
+// Útil para currículos acadêmicos importados do Lattes.
+export interface PublicationItem {
+  id: string;
+  title: string; // título do trabalho
+  venue?: string; // periódico / evento / editora
+  year?: string;
+  url?: string; // DOI ou link
+}
+
 export interface ResumeData {
   // Identidade
   fullName: string;
@@ -76,6 +86,7 @@ export interface ResumeData {
   skills: SkillItem[];
   languages: LanguageItem[];
   certifications: CertificationItem[];
+  publications: PublicationItem[];
 }
 
 // Configurações visuais aplicáveis por cima de qualquer template.
