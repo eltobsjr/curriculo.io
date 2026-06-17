@@ -42,6 +42,11 @@ const PT: Dict = {
   "lattes.success": "Currículo Lattes importado! Revise os dados e ajuste o que precisar.",
   "lattes.error": "Não foi possível ler o arquivo. Envie o .zip ou o .xml exportado do Lattes (botão XML na Plataforma Lattes).",
   "lattes.empty": "O arquivo do Lattes foi lido, mas não encontramos dados reconhecíveis.",
+  "lattes.pubTitle": "Publicações do Lattes",
+  "lattes.pubDesc": "Encontramos {n} publicação(ões). Escolha quais incluir no currículo.",
+  "lattes.pubAll": "Marcar todas",
+  "lattes.pubNone": "Limpar seleção",
+  "lattes.pubConfirm": "Importar",
   "editor.autosaved": "💾 Salvo automaticamente no seu navegador.",
   // quality
   "quality.title": "Qualidade",
@@ -193,6 +198,7 @@ const PT: Dict = {
   "list.remove": "Remover",
   // misc
   "common.close": "Fechar",
+  "common.cancel": "Cancelar",
 };
 
 const EN: Dict = {
@@ -223,6 +229,11 @@ const EN: Dict = {
   "lattes.success": "Lattes resume imported! Review the data and adjust as needed.",
   "lattes.error": "Could not read the file. Upload the .zip or .xml exported from Lattes (XML button on the Lattes Platform).",
   "lattes.empty": "The Lattes file was read, but no recognizable data was found.",
+  "lattes.pubTitle": "Lattes publications",
+  "lattes.pubDesc": "We found {n} publication(s). Choose which ones to include.",
+  "lattes.pubAll": "Select all",
+  "lattes.pubNone": "Clear selection",
+  "lattes.pubConfirm": "Import",
   "editor.autosaved": "💾 Saved automatically in your browser.",
   "quality.title": "Quality",
   "quality.great": "Great!",
@@ -360,6 +371,7 @@ const EN: Dict = {
   "list.moveDown": "Move down",
   "list.remove": "Remove",
   "common.close": "Close",
+  "common.cancel": "Cancel",
 };
 
 const ES: Dict = {
@@ -390,6 +402,11 @@ const ES: Dict = {
   "lattes.success": "¡Currículum Lattes importado! Revisa los datos y ajústalos si es necesario.",
   "lattes.error": "No se pudo leer el archivo. Sube el .zip o el .xml exportado de Lattes (botón XML en la Plataforma Lattes).",
   "lattes.empty": "El archivo de Lattes se leyó, pero no se encontraron datos reconocibles.",
+  "lattes.pubTitle": "Publicaciones de Lattes",
+  "lattes.pubDesc": "Encontramos {n} publicación(es). Elige cuáles incluir en el currículum.",
+  "lattes.pubAll": "Marcar todas",
+  "lattes.pubNone": "Limpiar selección",
+  "lattes.pubConfirm": "Importar",
   "editor.autosaved": "💾 Guardado automáticamente en tu navegador.",
   "quality.title": "Calidad",
   "quality.great": "¡Excelente!",
@@ -527,6 +544,7 @@ const ES: Dict = {
   "list.moveDown": "Bajar",
   "list.remove": "Eliminar",
   "common.close": "Cerrar",
+  "common.cancel": "Cancelar",
 };
 
 const DICTS: Record<UiLang, Dict> = { pt: PT, en: EN, es: ES };

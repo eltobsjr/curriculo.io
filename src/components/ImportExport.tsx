@@ -5,6 +5,8 @@ import { ResumeData, ResumeSettings } from "@/lib/resume-schema";
 import { Lang } from "@/lib/i18n";
 import { useT } from "@/lib/i18n-ui";
 import { importLattes } from "@/lib/lattes-import";
+import { LattesImportModal } from "./LattesImportModal";
+import { PublicationItem } from "@/lib/resume-schema";
 
 interface Props {
   content: Partial<Record<Lang, ResumeData>>;
@@ -24,6 +26,7 @@ export function ImportExport({ content, settings, onImport, onExample, onClear }
   const lattesRef = useRef<HTMLInputElement>(null);
   const [lattesLoading, setLattesLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [pendingLattes, setPendingLattes] = useState<Partial<ResumeData> | null>(null);
   const { t } = useT();
 
   const exportJson = () => {
@@ -53,6 +56,11 @@ export function ImportExport({ content, settings, onImport, onExample, onClear }
     reader.readAsText(file);
   };
 
+  const finalizeLattes = (data: Partial<ResumeData>) => {
+    onImport({ data, settings: { language: "pt" } });
+    alert(t("lattes.success"));
+  };
+
   const importLattesFile = async (file?: File) => {
     if (!file) return;
     setLattesLoading(true);
@@ -62,13 +70,22 @@ export function ImportExport({ content, settings, onImport, onExample, onClear }
         alert(t("lattes.empty"));
         return;
       }
-      onImport({ data, settings: { language: "pt" } });
-      alert(t("lattes.success"));
+      // Havendo publicações, deixa o usuário escolher quais incluir antes de importar.
+      if (data.publications?.length) {
+        setPendingLattes(data);
+        return;
+      }
+      finalizeLattes(data);
     } catch {
       alert(t("lattes.error"));
     } finally {
       setLattesLoading(false);
     }
+  };
+
+  const confirmLattes = (selected: PublicationItem[]) => {
+    if (pendingLattes) finalizeLattes({ ...pendingLattes, publications: selected });
+    setPendingLattes(null);
   };
 
   const close = () => setOpen(false);
@@ -112,6 +129,7 @@ export function ImportExport({ content, settings, onImport, onExample, onClear }
         accept="application/json,.json"
         className="hidden"
         onChange={(e) => importJson(e.target.files?.[0])}
+        onClick={(e) => (e.currentTarget.value = "")}
       />
       <input
         ref={lattesRef}
@@ -119,7 +137,16 @@ export function ImportExport({ content, settings, onImport, onExample, onClear }
         accept=".zip,.xml,application/zip,text/xml,application/xml"
         className="hidden"
         onChange={(e) => importLattesFile(e.target.files?.[0])}
+        onClick={(e) => (e.currentTarget.value = "")}
       />
+
+      {pendingLattes?.publications?.length ? (
+        <LattesImportModal
+          publications={pendingLattes.publications}
+          onConfirm={confirmLattes}
+          onCancel={() => setPendingLattes(null)}
+        />
+      ) : null}
     </div>
   );
 }
