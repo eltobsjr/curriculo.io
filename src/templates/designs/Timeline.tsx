@@ -1,6 +1,6 @@
 import { TemplateProps } from "../types";
 import { labels } from "@/lib/i18n";
-import { Bullets, contactItems, hasItems } from "../shared";
+import { Bullets, contactItems, hasItems, PublicationsList } from "../shared";
 
 // Timeline: experiências e formação dispostas em linha do tempo vertical.
 export default function Timeline({ data, settings }: TemplateProps) {
@@ -112,6 +112,13 @@ export default function Timeline({ data, settings }: TemplateProps) {
           </div>
         )}
       </div>
+
+      {hasItems(data.publications) && (
+        <section className="mt-5">
+          <SectionTitle color={c}>{L.publications}</SectionTitle>
+          <PublicationsList items={data.publications} />
+        </section>
+      )}
     </div>
   );
 }

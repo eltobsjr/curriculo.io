@@ -1,6 +1,6 @@
 import { TemplateProps } from "../types";
 import { labels } from "@/lib/i18n";
-import { Bullets, contactItems, hasItems } from "../shared";
+import { Bullets, contactItems, hasItems, PublicationsList } from "../shared";
 
 // Compacto: duas colunas densas, ótimo para currículos com muito conteúdo.
 export default function Compacto({ data, settings }: TemplateProps) {
@@ -67,6 +67,12 @@ export default function Compacto({ data, settings }: TemplateProps) {
                   </div>
                 ))}
               </div>
+            </Block>
+          )}
+
+          {hasItems(data.publications) && (
+            <Block title={L.publications} color={c}>
+              <PublicationsList items={data.publications} className="text-slate-600" />
             </Block>
           )}
         </div>

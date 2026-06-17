@@ -295,4 +295,27 @@ export const SECTIONS: SectionDef[] = [
       />
     ),
   },
+  {
+    id: "publicacoes",
+    icon: "📚",
+    render: (data, update, _showPhoto, t) => (
+      <ListEditor
+        items={data.publications}
+        onChange={(publications) => update({ publications })}
+        create={() => ({ id: uid(), title: "", venue: "", year: "", url: "" })}
+        addLabel={t("list.addPub")}
+        itemTitle={(p) => p.title || t("list.pub")}
+        render={(p, set) => (
+          <div className="space-y-2">
+            <TextInput value={p.title} onChange={(e) => set({ title: e.target.value })} placeholder={t("ph.pubTitle")} />
+            <div className="grid grid-cols-[1fr_90px] gap-2">
+              <TextInput value={p.venue ?? ""} onChange={(e) => set({ venue: e.target.value })} placeholder={t("ph.pubVenue")} />
+              <TextInput value={p.year ?? ""} onChange={(e) => set({ year: e.target.value })} placeholder={t("ph.pubYear")} />
+            </div>
+            <TextInput value={p.url ?? ""} onChange={(e) => set({ url: e.target.value })} placeholder={t("ph.pubUrl")} />
+          </div>
+        )}
+      />
+    ),
+  },
 ];

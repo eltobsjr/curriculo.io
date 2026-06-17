@@ -1,6 +1,6 @@
 import { TemplateProps } from "../types";
 import { labels } from "@/lib/i18n";
-import { Bullets, contactItems, hasItems } from "../shared";
+import { Bullets, contactItems, hasItems, PublicationsList } from "../shared";
 
 // Corporativo: bloco de cabeçalho sólido, sóbrio e profissional.
 export default function Corporativo({ data, settings }: TemplateProps) {
@@ -104,6 +104,12 @@ export default function Corporativo({ data, settings }: TemplateProps) {
                 </li>
               ))}
             </ul>
+          </Section>
+        )}
+
+        {hasItems(data.publications) && (
+          <Section title={L.publications} color={c}>
+            <PublicationsList items={data.publications} className="text-slate-600" />
           </Section>
         )}
       </div>

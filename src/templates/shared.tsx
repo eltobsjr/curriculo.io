@@ -1,4 +1,4 @@
-import { ResumeData } from "@/lib/resume-schema";
+import { PublicationItem, ResumeData } from "@/lib/resume-schema";
 
 // Quebra uma descrição multi-linha em bullets. Linhas vazias são ignoradas.
 export function Bullets({ text, className = "" }: { text?: string; className?: string }) {
@@ -28,6 +28,22 @@ export function contactItems(data: ResumeData): { key: string; value: string }[]
 
 export function hasItems<T>(arr: T[] | undefined): arr is T[] {
   return Array.isArray(arr) && arr.length > 0;
+}
+
+// Lista de publicações (produção bibliográfica). Marcação neutra que se adapta
+// a qualquer template — usa opacidade em vez de cor para o texto secundário.
+export function PublicationsList({ items, className = "" }: { items: PublicationItem[]; className?: string }) {
+  return (
+    <ul className={`space-y-1 ${className}`}>
+      {items.map((p) => (
+        <li key={p.id}>
+          <span className="font-medium">{p.title}</span>
+          {p.venue ? <span className="opacity-80">. {p.venue}</span> : null}
+          {p.year ? <span className="opacity-60"> ({p.year})</span> : null}
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 // Barra de nível 1..5 reutilizável.

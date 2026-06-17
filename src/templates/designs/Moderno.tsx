@@ -1,6 +1,6 @@
 import { TemplateProps } from "../types";
 import { labels } from "@/lib/i18n";
-import { Bullets, contactItems, hasItems, LevelBar } from "../shared";
+import { Bullets, contactItems, hasItems, LevelBar, PublicationsList } from "../shared";
 
 // Moderno: cabeçalho com faixa de cor, uma coluna, limpo e atual.
 export default function Moderno({ data, settings }: TemplateProps) {
@@ -130,6 +130,12 @@ export default function Moderno({ data, settings }: TemplateProps) {
               </div>
             ))}
           </div>
+        </Section>
+      )}
+
+      {hasItems(data.publications) && (
+        <Section title={L.publications} color={c}>
+          <PublicationsList items={data.publications} className="text-slate-600" />
         </Section>
       )}
     </div>

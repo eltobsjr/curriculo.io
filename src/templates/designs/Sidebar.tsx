@@ -1,6 +1,6 @@
 import { TemplateProps } from "../types";
 import { labels } from "@/lib/i18n";
-import { Bullets, hasItems, LevelDots } from "../shared";
+import { Bullets, hasItems, LevelDots, PublicationsList } from "../shared";
 
 // Sidebar: coluna lateral colorida com foto, contato, skills e idiomas.
 export default function Sidebar({ data, settings }: TemplateProps) {
@@ -127,6 +127,12 @@ export default function Sidebar({ data, settings }: TemplateProps) {
                 </div>
               ))}
             </div>
+          </MainSection>
+        )}
+
+        {hasItems(data.publications) && (
+          <MainSection title={L.publications} color={c}>
+            <PublicationsList items={data.publications} className="text-slate-600" />
           </MainSection>
         )}
       </main>

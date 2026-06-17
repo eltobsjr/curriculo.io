@@ -1,6 +1,6 @@
 import { TemplateProps } from "../types";
 import { labels } from "@/lib/i18n";
-import { Bullets, contactItems, hasItems } from "../shared";
+import { Bullets, contactItems, hasItems, PublicationsList } from "../shared";
 
 // Minimalista: muito espaço em branco, tipografia fina, linhas sutis.
 export default function Minimalista({ data, settings }: TemplateProps) {
@@ -98,6 +98,12 @@ export default function Minimalista({ data, settings }: TemplateProps) {
           </div>
         )}
       </div>
+
+      {hasItems(data.publications) && (
+        <Section title={L.publications} color={c}>
+          <PublicationsList items={data.publications} className="text-slate-600" />
+        </Section>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { TemplateProps } from "../types";
 import { labels } from "@/lib/i18n";
-import { Bullets, contactItems, hasItems } from "../shared";
+import { Bullets, contactItems, hasItems, PublicationsList } from "../shared";
 
 // Elegante: títulos serifados, finas linhas de destaque, sofisticado.
 export default function Elegante({ data, settings }: TemplateProps) {
@@ -97,6 +97,12 @@ export default function Elegante({ data, settings }: TemplateProps) {
           <p className="text-slate-600">
             {data.certifications.map((cert) => cert.name + (cert.date ? ` (${cert.date})` : "")).join(" · ")}
           </p>
+        </Section>
+      )}
+
+      {hasItems(data.publications) && (
+        <Section title={L.publications} color={c}>
+          <PublicationsList items={data.publications} className="text-left text-slate-600" />
         </Section>
       )}
     </div>

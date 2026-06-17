@@ -1,6 +1,6 @@
 import { TemplateProps } from "../types";
 import { labels } from "@/lib/i18n";
-import { Bullets, contactItems, hasItems } from "../shared";
+import { Bullets, contactItems, hasItems, PublicationsList } from "../shared";
 
 // Clássico/ATS: serifado, uma coluna, sem cores fortes nem ícones.
 // Otimizado para leitura por sistemas de triagem (ATS).
@@ -104,6 +104,12 @@ export default function ClassicoATS({ data, settings }: TemplateProps) {
               </div>
             ))}
           </div>
+        </Section>
+      )}
+
+      {hasItems(data.publications) && (
+        <Section title={L.publications}>
+          <PublicationsList items={data.publications} />
         </Section>
       )}
     </div>
