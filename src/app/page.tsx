@@ -209,16 +209,14 @@ export default function Home() {
                   {t("editor.advanced")}
                 </button>
               </div>
-              <div className="flex flex-wrap items-center gap-1 text-xs">
-                <button onClick={resetSample} className="text-slate-500 hover:underline">
-                  {t("editor.example")}
-                </button>
-                <span className="text-slate-300">·</span>
-                <ImportExport content={content} settings={settings} onImport={loadDocument} />
-                <span className="text-slate-300">·</span>
-                <button onClick={clearAll} className="text-red-500 hover:underline">
-                  {t("editor.clear")}
-                </button>
+              <div className="flex items-center gap-1 text-xs">
+                <ImportExport
+                  content={content}
+                  settings={settings}
+                  onImport={loadDocument}
+                  onExample={resetSample}
+                  onClear={clearAll}
+                />
               </div>
             </div>
           </div>
